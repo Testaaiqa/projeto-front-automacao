@@ -1,0 +1,21 @@
+import React from 'react';
+import { createRoot } from 'react-dom/client';
+import App from './App.jsx';
+import './styles.css';
+
+const rootElement = document.getElementById('root');
+const bootFallback = document.getElementById('boot-fallback');
+
+if (rootElement) {
+  const root = createRoot(rootElement);
+
+  root.render(
+    <React.StrictMode>
+      <App />
+    </React.StrictMode>,
+  );
+
+  if (bootFallback) {
+    bootFallback.remove();
+  }
+}

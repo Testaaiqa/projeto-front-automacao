@@ -1,0 +1,31 @@
+[
+  {
+    "id": "1",
+    "name": "Usuario QA",
+    "email": "qa@teste.com",
+    "password": "123456"
+  },
+  {
+    "id": "99052fb5-3c8d-4934-a259-dcdb603d502e",
+    "name": "andre luis",
+    "firstName": "andre",
+    "lastName": "luis",
+    "email": "qa2@teste.com",
+    "password": "Z5xu_6tBdmN7_Cj",
+    "cpf": "090.909.090-90",
+    "birthDate": "1991-09-09",
+    "phone": "(00) 00000-9988",
+    "gender": "masculino",
+    "callAsMr": true,
+    "callAsMrs": true,
+    "zipCode": "23232-323",
+    "street": "Dois",
+    "number": "1",
+    "complement": "casa",
+    "neighborhood": "Agua fria",
+    "city": "Paulista",
+    "state": "PA",
+    "acceptTerms": true,
+    "receiveQaTips": true
+  }
+]
