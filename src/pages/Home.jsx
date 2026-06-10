@@ -50,7 +50,7 @@ function Home({ onNavigate = () => {} }) {
     <div className="home-page" data-testid="home-page">
       <section className="home-welcome">
         <div className="welcome-content">
-          <h2 data-testid="home-title">Bem-vindo ao Testa ai QA</h2>
+          <h2 data-testid="home-title">Bem-vindo ao Testa aí QA</h2>
           <p data-testid="home-subtitle">
             Aprenda fluxos de automação com cenários simples, rastreáveis e prontos para testes.
           </p>

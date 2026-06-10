@@ -8,7 +8,7 @@ import ProgressiveBar from './pages/ProgressiveBar';
 import Forms from './pages/Forms';
 import ComingSoon from './pages/ComingSoon';
 
-const APP_NAME = 'Testa ai QA - Plataforma de Test';
+const APP_NAME = 'Testa aí QA - Plataforma de Test';
 const BRAZIL_STATES = [
   { value: 'AC', label: 'Acre' },
   { value: 'AL', label: 'Alagoas' },

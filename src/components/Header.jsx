@@ -16,7 +16,7 @@ function Header({ onMenuToggle, currentUser }) {
         </button>
 
         <div className="header-title">
-          <h1 data-testid="header-title">Testa ai QA</h1>
+          <h1 data-testid="header-title">Testa aí QA</h1>
         </div>
 
         <div className="header-user">

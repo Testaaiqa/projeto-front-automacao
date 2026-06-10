@@ -1,8 +1,8 @@
-# TESTA AI QA - Documentação Técnica Completa
+# Testa aí QA - Documentação Técnica Completa
 
 ## 📋 Resumo Executivo
 
-**Projeto:** Plataforma Testa ai QA - Sistema de Automação com UI para Testes
+**Projeto:** Plataforma Testa aí QA - Sistema de Automação com UI para Testes
 **Status:** Em desenvolvimento
 **Tecnologia:** React 19 + Vite + Node.js
 **Porta Frontend:** 3000
@@ -119,7 +119,7 @@ const [formMode, setFormMode] = useState('login'); // 'login' ou 'register'
 **Props:** `onMenuToggle`, `currentUser`
 **Features:**
 - Botão hamburger para abrir/fechar sidebar
-- Título "Testa ai QA"
+- Título "Testa aí QA"
 - Saudação personalizada com nome do usuário
 
 ### Sidebar.jsx

@@ -1,4 +1,4 @@
-# PROJECT CONTEXT - Testa ai QA Platform
+# PROJECT CONTEXT - Testa aí QA Platform
 
 ## Estrutura do Projeto
 ```
@@ -56,7 +56,7 @@ const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
 ### Header
 - Botão hamburger
-- Título "Testa ai QA"
+- Título "Testa aí QA"
 - Saudação personalizada
 
 ### Home

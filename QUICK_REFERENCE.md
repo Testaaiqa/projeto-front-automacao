@@ -1,4 +1,4 @@
-# QUICK REFERENCE - Testa ai QA
+# QUICK REFERENCE - Testa aí QA
 
 ## 🚀 Start
 ```bash
