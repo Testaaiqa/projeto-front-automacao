@@ -1,5 +1,11 @@
 import React, { useState } from 'react';
 import { createUser, loginUser } from './services/userService.js';
+import Sidebar from './components/Sidebar';
+import Header from './components/Header';
+import Home from './pages/Home';
+import Usuarios from './pages/Usuarios';
+import ProgressiveBar from './pages/ProgressiveBar';
+import ComingSoon from './pages/ComingSoon';
 
 const APP_NAME = 'Testa ai QA - Plataforma de Test';
 const BRAZIL_STATES = [
@@ -134,6 +140,8 @@ function FieldError({ field, errors }) {
 
 function App() {
   const [formMode, setFormMode] = useState('login');
+  const [currentPage, setCurrentPage] = useState('login');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -266,6 +274,18 @@ function App() {
       }
     });
 
+    if (formData.cpf && onlyDigits(formData.cpf).length !== 11) {
+      nextErrors.cpf = 'CPF deve ter 11 digitos.';
+    }
+
+    if (formData.phone) {
+      const phoneLength = onlyDigits(formData.phone).length;
+
+      if (phoneLength !== 10 && phoneLength !== 11) {
+        nextErrors.phone = 'Telefone deve ter DDD e 8 ou 9 digitos.';
+      }
+    }
+
     return nextErrors;
   }
 
@@ -298,6 +318,11 @@ function App() {
       if (isRegisterMode) {
         setSuccessModalUser(result.user);
         setFormMode('login');
+      } else {
+        // Redireciona para home após login bem-sucedido
+        setTimeout(() => {
+          setCurrentPage('home');
+        }, 500);
       }
 
       resetForm();
@@ -308,8 +333,45 @@ function App() {
     }
   }
 
-  return (
-    <main className="app-shell" data-testid="app-shell">
+  function handleNavigation(pageId) {
+    if (pageId === 'logout') {
+      setLoggedUser(null);
+      setCurrentPage('login');
+      setFeedback('');
+      setFormMode('login');
+      resetForm();
+      return;
+    }
+    setCurrentPage(pageId);
+  }
+
+  function toggleSidebar() {
+    setIsSidebarOpen(!isSidebarOpen);
+  }
+
+  function renderPageContent() {
+    switch (currentPage) {
+      case 'home':
+        return <Home />;
+      case 'usuarios':
+        return <Usuarios />;
+      case 'progressive-bar':
+        return <ProgressiveBar />;
+      case 'forms':
+        return <ComingSoon title="Formulários" description="Teste cenários com formulários interativos" />;
+      case 'tabelas':
+        return <ComingSoon title="Tabelas" description="Explore tabelas dinâmicas e filtros" />;
+      case 'alerts':
+        return <ComingSoon title="Alertas" description="Interaja com diferentes tipos de alertas" />;
+      default:
+        return <Home />;
+    }
+  }
+
+  // Se não está autenticado, mostra tela de login/registro
+  if (!loggedUser) {
+      return (
+        <main className="app-shell" data-testid="app-shell">
       <section className="auth-panel" data-testid="auth-panel">
         <div className="brand-area" data-testid="brand-area">
           <span className="brand-badge" data-testid="brand-badge">
@@ -701,6 +763,28 @@ function App() {
         </div>
       )}
     </main>
+    );
+  }
+
+  // Se está autenticado, mostra dashboard com sidebar
+  return (
+    <div className="dashboard-shell" data-testid="dashboard-shell">
+      <Sidebar
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+        onNavigate={handleNavigation}
+        currentUser={loggedUser}
+      />
+      <div className="dashboard-content">
+        <Header
+          onMenuToggle={toggleSidebar}
+          currentUser={loggedUser}
+        />
+        <main className="page-container" data-testid="page-container">
+          {renderPageContent()}
+        </main>
+      </div>
+    </div>
   );
 }
 

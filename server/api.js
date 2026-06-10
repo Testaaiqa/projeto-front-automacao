@@ -24,7 +24,7 @@ const REQUIRED_REGISTER_FIELDS = [
 function sendJson(response, statusCode, body) {
   response.writeHead(statusCode, {
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type',
     'Content-Type': 'application/json',
   });
@@ -69,9 +69,42 @@ function validateRegisterPayload(userData) {
   return missingFields;
 }
 
+function onlyDigits(value = '') {
+  return String(value).replace(/\D/g, '');
+}
+
+function validateCpf(cpf) {
+  return onlyDigits(cpf).length === 11;
+}
+
+function validatePhone(phone) {
+  const digits = onlyDigits(phone);
+  return digits.length === 10 || digits.length === 11;
+}
+
+function validateContactPayload(userData, required = false) {
+  const errors = [];
+
+  if ((required || userData.cpf) && !validateCpf(userData.cpf)) {
+    errors.push('CPF deve ter 11 digitos.');
+  }
+
+  if ((required || userData.phone) && !validatePhone(userData.phone)) {
+    errors.push('Telefone deve ter DDD e 8 ou 9 digitos.');
+  }
+
+  return errors;
+}
+
 const server = createServer(async (request, response) => {
+  // Handle CORS preflight
   if (request.method === 'OPTIONS') {
-    sendJson(response, 204, {});
+    response.writeHead(204, {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+    });
+    response.end();
     return;
   }
 
@@ -90,6 +123,16 @@ const server = createServer(async (request, response) => {
       sendJson(response, 400, {
         success: false,
         message: `Campos obrigatorios: ${missingFields.join(', ')}.`,
+      });
+      return;
+    }
+
+    const contactErrors = validateContactPayload(userData, true);
+
+    if (contactErrors.length > 0) {
+      sendJson(response, 400, {
+        success: false,
+        message: contactErrors.join(' '),
       });
       return;
     }
@@ -151,6 +194,108 @@ const server = createServer(async (request, response) => {
       success: true,
       message: 'Login realizado com sucesso.',
       user,
+    });
+    return;
+  }
+
+  // DELETE /users/:id
+  if (request.method === 'DELETE' && request.url.startsWith('/users/')) {
+    const userId = request.url.split('/')[2];
+    const users = await readUsers();
+    const userIndex = users.findIndex((user) => user.id === userId);
+
+    if (userIndex === -1) {
+      sendJson(response, 404, {
+        success: false,
+        message: 'Usuario nao encontrado.',
+      });
+      return;
+    }
+
+    const deletedUser = users[userIndex];
+    const updatedUsers = users.filter((user) => user.id !== userId);
+    await writeUsers(updatedUsers);
+
+    sendJson(response, 200, {
+      success: true,
+      message: 'Usuario deletado com sucesso.',
+      user: deletedUser,
+    });
+    return;
+  }
+
+  // PUT /users/:id - Atualizar usuário
+  if (request.method === 'PUT' && request.url.startsWith('/users/') && !request.url.includes('/status')) {
+    const userId = request.url.split('/')[2];
+    const updateData = await readRequestBody(request);
+    const users = await readUsers();
+    const userIndex = users.findIndex((user) => user.id === userId);
+
+    if (userIndex === -1) {
+      sendJson(response, 404, {
+        success: false,
+        message: 'Usuario nao encontrado.',
+      });
+      return;
+    }
+
+    const contactErrors = validateContactPayload(updateData);
+
+    if (contactErrors.length > 0) {
+      sendJson(response, 400, {
+        success: false,
+        message: contactErrors.join(' '),
+      });
+      return;
+    }
+
+    const updatedUser = {
+      ...users[userIndex],
+      ...updateData,
+      id: users[userIndex].id, // Impede mudança de ID
+    };
+
+    users[userIndex] = updatedUser;
+    await writeUsers(users);
+
+    sendJson(response, 200, {
+      success: true,
+      message: 'Usuario atualizado com sucesso.',
+      user: updatedUser,
+    });
+    return;
+  }
+
+  // PATCH /users/:id/status - Alterar status do usuário
+  if (request.method === 'PATCH' && request.url.startsWith('/users/') && request.url.includes('/status')) {
+    const userId = request.url.split('/')[2];
+    const { status } = await readRequestBody(request);
+    const users = await readUsers();
+    const userIndex = users.findIndex((user) => user.id === userId);
+
+    if (userIndex === -1) {
+      sendJson(response, 404, {
+        success: false,
+        message: 'Usuario nao encontrado.',
+      });
+      return;
+    }
+
+    if (!['ativo', 'inativo'].includes(status)) {
+      sendJson(response, 400, {
+        success: false,
+        message: 'Status invalido. Use "ativo" ou "inativo".',
+      });
+      return;
+    }
+
+    users[userIndex].status = status;
+    await writeUsers(users);
+
+    sendJson(response, 200, {
+      success: true,
+      message: `Usuario ${status} com sucesso.`,
+      user: users[userIndex],
     });
     return;
   }

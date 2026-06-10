@@ -1,11 +1,5 @@
 [
   {
-    "id": "1",
-    "name": "Usuario QA",
-    "email": "qa@teste.com",
-    "password": "123456"
-  },
-  {
     "id": "99052fb5-3c8d-4934-a259-dcdb603d502e",
     "name": "andre luis",
     "firstName": "andre",
@@ -26,6 +20,31 @@
     "city": "Paulista",
     "state": "PA",
     "acceptTerms": true,
-    "receiveQaTips": true
+    "receiveQaTips": true,
+    "status": "ativo"
+  },
+  {
+    "id": "afb6b4b4-cf41-4a66-995d-42027913c956",
+    "name": "João Silva",
+    "firstName": "João",
+    "lastName": "Silva",
+    "email": "joao.silva@teste.com",
+    "password": "123456",
+    "cpf": "123.456.789-01",
+    "birthDate": "1990-01-15",
+    "phone": "(11) 98765-4321",
+    "gender": "masculino",
+    "callAsMr": true,
+    "callAsMrs": false,
+    "zipCode": "01310-100",
+    "street": "Avenida Paulista",
+    "number": "1000",
+    "complement": "Apto 101",
+    "neighborhood": "Centro",
+    "city": "São Paulo",
+    "state": "SP",
+    "acceptTerms": true,
+    "receiveQaTips": true,
+    "status": "ativo"
   }
 ]
