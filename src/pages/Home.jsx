@@ -1,6 +1,6 @@
 import React from 'react';
 
-function Home() {
+function Home({ onNavigate = () => {} }) {
   const modules = [
     {
       id: 'usuarios',
@@ -72,6 +72,7 @@ function Home() {
               <p className="module-description">{module.description}</p>
               <button
                 className="module-button"
+                onClick={() => onNavigate(module.id)}
                 data-testid={`module-btn-${module.id}`}
                 style={{ backgroundColor: module.color }}
               >

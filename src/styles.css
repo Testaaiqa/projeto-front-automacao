@@ -1301,6 +1301,130 @@ select:focus {
   transition: none;
 }
 
+/* Forms Page */
+
+.forms-page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.market-form {
+  display: grid;
+  gap: 20px;
+}
+
+.form-lab-section {
+  background: #ffffff;
+  border: 1px solid #d9e2e8;
+  border-radius: 8px;
+  display: grid;
+  gap: 18px;
+  padding: 24px;
+}
+
+.form-lab-heading {
+  align-items: center;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+}
+
+.form-lab-heading h3 {
+  color: #1d2433;
+  font-size: 18px;
+  margin: 0;
+}
+
+.form-lab-heading span {
+  background: #eef7fa;
+  border: 1px solid #c9e3ea;
+  border-radius: 999px;
+  color: #126d82;
+  font-size: 13px;
+  font-weight: 800;
+  padding: 8px 12px;
+}
+
+.form-extras-grid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: minmax(220px, 1fr) 2fr;
+}
+
+.file-drop {
+  background: #f7fafb;
+  border: 1px dashed #9eb3bf;
+  border-radius: 8px;
+  color: #526071;
+  cursor: pointer;
+  display: grid;
+  min-height: 132px;
+  padding: 18px;
+  place-items: center;
+  text-align: center;
+}
+
+.file-drop span {
+  font-weight: 800;
+}
+
+.file-drop input[type="file"] {
+  border: 0;
+  min-height: auto;
+  padding: 8px 0 0;
+}
+
+.toggle-stack {
+  align-content: start;
+  display: grid;
+  gap: 12px;
+}
+
+.form-lab-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.form-lab-actions button {
+  min-width: 160px;
+}
+
+.form-result-panel {
+  background: #e9f7f3;
+  border: 1px solid #a7d9cd;
+  border-radius: 8px;
+  color: #17483d;
+  display: grid;
+  gap: 12px;
+  padding: 20px;
+}
+
+.form-result-panel h3 {
+  margin: 0;
+}
+
+.form-result-panel p {
+  margin: 0;
+}
+
+.result-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.result-tags span {
+  background: #ffffff;
+  border: 1px solid #a7d9cd;
+  border-radius: 999px;
+  color: #17483d;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 6px 10px;
+}
+
 /* Coming Soon Page */
 
 .coming-soon-page {
@@ -1397,6 +1521,21 @@ select:focus {
   }
 
   .pb-controls {
+    flex-direction: column;
+  }
+
+  .form-lab-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .form-extras-grid,
+  .pb-volume-grid,
+  .pb-milestones {
+    grid-template-columns: 1fr;
+  }
+
+  .form-lab-actions {
     flex-direction: column;
   }
 

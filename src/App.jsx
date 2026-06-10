@@ -5,6 +5,7 @@ import Header from './components/Header';
 import Home from './pages/Home';
 import Usuarios from './pages/Usuarios';
 import ProgressiveBar from './pages/ProgressiveBar';
+import Forms from './pages/Forms';
 import ComingSoon from './pages/ComingSoon';
 
 const APP_NAME = 'Testa ai QA - Plataforma de Test';
@@ -352,19 +353,21 @@ function App() {
   function renderPageContent() {
     switch (currentPage) {
       case 'home':
-        return <Home />;
+        return <Home onNavigate={handleNavigation} />;
       case 'usuarios':
         return <Usuarios />;
       case 'progressive-bar':
         return <ProgressiveBar />;
       case 'forms':
-        return <ComingSoon title="Formulários" description="Teste cenários com formulários interativos" />;
+        return <Forms />;
       case 'tabelas':
         return <ComingSoon title="Tabelas" description="Explore tabelas dinâmicas e filtros" />;
       case 'alerts':
         return <ComingSoon title="Alertas" description="Interaja com diferentes tipos de alertas" />;
+      case 'modais':
+        return <ComingSoon title="Modais" description="Teste componentes modais e overlays" />;
       default:
-        return <Home />;
+        return <Home onNavigate={handleNavigation} />;
     }
   }
 
@@ -773,6 +776,7 @@ function App() {
         isOpen={isSidebarOpen}
         onClose={() => setIsSidebarOpen(false)}
         onNavigate={handleNavigation}
+        currentPage={currentPage}
         currentUser={loggedUser}
       />
       <div className="dashboard-content">

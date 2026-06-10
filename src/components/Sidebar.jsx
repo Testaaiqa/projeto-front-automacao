@@ -1,6 +1,6 @@
 import React from 'react';
 
-function Sidebar({ isOpen, onClose, onNavigate, currentUser }) {
+function Sidebar({ isOpen, onClose, onNavigate, currentPage, currentUser }) {
   const menuItems = [
     {
       id: 'home',
@@ -31,6 +31,11 @@ function Sidebar({ isOpen, onClose, onNavigate, currentUser }) {
       id: 'alerts',
       label: 'Alertas',
       icon: '⚠️',
+    },
+    {
+      id: 'modais',
+      label: 'Modais',
+      icon: '[]',
     },
   ];
 
@@ -78,7 +83,7 @@ function Sidebar({ isOpen, onClose, onNavigate, currentUser }) {
             {menuItems.map((item) => (
               <li key={item.id}>
                 <button
-                  className="sidebar-menu-item"
+                  className={`sidebar-menu-item ${currentPage === item.id ? 'active' : ''}`}
                   onClick={() => handleMenuClick(item.id)}
                   data-testid={`sidebar-menu-${item.id}`}
                 >
