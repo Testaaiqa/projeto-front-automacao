@@ -6,6 +6,7 @@ import Home from './pages/Home';
 import Usuarios from './pages/Usuarios';
 import ProgressiveBar from './pages/ProgressiveBar';
 import Forms from './pages/Forms';
+import Tables from './pages/Tables';
 import ComingSoon from './pages/ComingSoon';
 
 const APP_NAME = 'Testa aí QA - Plataforma de Test';
@@ -81,6 +82,21 @@ const REGISTER_REQUIRED_FIELDS = [
   'receiveQaTips',
 ];
 
+const SESSION_USER_KEY = 'testa-ai-qa-user';
+const SESSION_PAGE_KEY = 'testa-ai-qa-page';
+
+function readStoredUser() {
+  try {
+    return JSON.parse(localStorage.getItem(SESSION_USER_KEY));
+  } catch (error) {
+    return null;
+  }
+}
+
+function readStoredPage() {
+  return localStorage.getItem(SESSION_PAGE_KEY) || 'home';
+}
+
 function onlyDigits(value) {
   return value.replace(/\D/g, '');
 }
@@ -141,7 +157,7 @@ function FieldError({ field, errors }) {
 
 function App() {
   const [formMode, setFormMode] = useState('login');
-  const [currentPage, setCurrentPage] = useState('login');
+  const [currentPage, setCurrentPage] = useState(() => (readStoredUser() ? readStoredPage() : 'login'));
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [formData, setFormData] = useState({
     firstName: '',
@@ -165,7 +181,7 @@ function App() {
     receiveQaTips: false,
   });
   const [feedback, setFeedback] = useState('');
-  const [loggedUser, setLoggedUser] = useState(null);
+  const [loggedUser, setLoggedUser] = useState(() => readStoredUser());
   const [isLoading, setIsLoading] = useState(false);
   const [successModalUser, setSuccessModalUser] = useState(null);
   const [fieldErrors, setFieldErrors] = useState({});
@@ -314,6 +330,7 @@ function App() {
       }
 
       setLoggedUser(result.user);
+      localStorage.setItem(SESSION_USER_KEY, JSON.stringify(result.user));
       setFeedback(result.message);
 
       if (isRegisterMode) {
@@ -323,6 +340,7 @@ function App() {
         // Redireciona para home após login bem-sucedido
         setTimeout(() => {
           setCurrentPage('home');
+          localStorage.setItem(SESSION_PAGE_KEY, 'home');
         }, 500);
       }
 
@@ -338,12 +356,15 @@ function App() {
     if (pageId === 'logout') {
       setLoggedUser(null);
       setCurrentPage('login');
+      localStorage.removeItem(SESSION_USER_KEY);
+      localStorage.removeItem(SESSION_PAGE_KEY);
       setFeedback('');
       setFormMode('login');
       resetForm();
       return;
     }
     setCurrentPage(pageId);
+    localStorage.setItem(SESSION_PAGE_KEY, pageId);
   }
 
   function toggleSidebar() {
@@ -361,7 +382,7 @@ function App() {
       case 'forms':
         return <Forms />;
       case 'tabelas':
-        return <ComingSoon title="Tabelas" description="Explore tabelas dinâmicas e filtros" />;
+        return <Tables />;
       case 'alerts':
         return <ComingSoon title="Alertas" description="Interaja com diferentes tipos de alertas" />;
       case 'modais':

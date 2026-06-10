@@ -243,7 +243,7 @@ function Forms() {
     <div className="forms-page" data-testid="forms-page">
       <div className="page-header">
         <div>
-          <h2 data-testid="forms-title">Formularios</h2>
+          <h2 data-testid="forms-title">Formulários</h2>
           <p className="page-description">Fluxos ricos para validar campos, regras, estados e payloads.</p>
         </div>
       </div>
