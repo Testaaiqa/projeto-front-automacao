@@ -1,6 +1,23 @@
 import { getUsers, sendJson, setUsers, validateContactPayload } from '../_usersStore.js';
+import { applyRateLimitHeaders, consumeRateLimit } from '../_rateLimit.js';
 
 export default function handler(request, response) {
+  const rateLimit = consumeRateLimit(request, {
+    keyPrefix: `user-detail:${request.method}`,
+    capacity: 30,
+    refillPerMinute: 20,
+  });
+
+  applyRateLimitHeaders(response, rateLimit);
+
+  if (!rateLimit.allowed) {
+    sendJson(response, 429, {
+      success: false,
+      message: 'Muitas requisições para este recurso. Aguarde alguns segundos e tente novamente.',
+    });
+    return;
+  }
+
   const { id: userId } = request.query;
   const users = getUsers();
   const userIndex = users.findIndex((user) => user.id === userId);

@@ -5,8 +5,26 @@ import {
   validateContactPayload,
   validateRegisterPayload,
 } from './_usersStore.js';
+import { applyRateLimitHeaders, consumeRateLimit } from './_rateLimit.js';
 
 export default function handler(request, response) {
+  const isWriteRequest = request.method === 'POST';
+  const rateLimit = consumeRateLimit(request, {
+    keyPrefix: `users:${request.method}`,
+    capacity: isWriteRequest ? 20 : 80,
+    refillPerMinute: isWriteRequest ? 10 : 80,
+  });
+
+  applyRateLimitHeaders(response, rateLimit);
+
+  if (!rateLimit.allowed) {
+    sendJson(response, 429, {
+      success: false,
+      message: 'Muitas requisições para usuários. Aguarde alguns segundos e tente novamente.',
+    });
+    return;
+  }
+
   if (request.method === 'GET') {
     sendJson(response, 200, getUsers());
     return;

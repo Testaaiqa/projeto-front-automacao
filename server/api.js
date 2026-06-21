@@ -1,6 +1,7 @@
 import { createServer } from 'node:http';
 import { randomUUID } from 'node:crypto';
 import { readUsers, writeUsers } from './database.js';
+import { applyRateLimitHeaders, consumeRateLimit } from '../api/_rateLimit.js';
 
 const PORT = 3001;
 const REQUIRED_REGISTER_FIELDS = [
@@ -92,6 +93,38 @@ function validateContactPayload(userData, required = false) {
   return errors;
 }
 
+function getRateLimitConfig(request) {
+  if (request.method === 'POST' && request.url === '/login') {
+    return {
+      keyPrefix: 'local-login',
+      capacity: 8,
+      refillPerMinute: 4,
+    };
+  }
+
+  if (request.method === 'POST' && request.url === '/users') {
+    return {
+      keyPrefix: 'local-users-post',
+      capacity: 20,
+      refillPerMinute: 10,
+    };
+  }
+
+  if (request.url?.startsWith('/users/')) {
+    return {
+      keyPrefix: `local-user-detail:${request.method}`,
+      capacity: 30,
+      refillPerMinute: 20,
+    };
+  }
+
+  return {
+    keyPrefix: `local-api:${request.method}`,
+    capacity: 80,
+    refillPerMinute: 80,
+  };
+}
+
 const server = createServer(async (request, response) => {
   // Handle CORS preflight
   if (request.method === 'OPTIONS') {
@@ -101,6 +134,17 @@ const server = createServer(async (request, response) => {
       'Access-Control-Allow-Headers': 'Content-Type',
     });
     response.end();
+    return;
+  }
+
+  const rateLimit = consumeRateLimit(request, getRateLimitConfig(request));
+  applyRateLimitHeaders(response, rateLimit);
+
+  if (!rateLimit.allowed) {
+    sendJson(response, 429, {
+      success: false,
+      message: 'Muitas requisições. Aguarde alguns segundos e tente novamente.',
+    });
     return;
   }
 

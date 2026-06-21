@@ -1,6 +1,23 @@
 import { getUsers, sendJson } from './_usersStore.js';
+import { applyRateLimitHeaders, consumeRateLimit } from './_rateLimit.js';
 
 export default function handler(request, response) {
+  const rateLimit = consumeRateLimit(request, {
+    keyPrefix: 'login',
+    capacity: 8,
+    refillPerMinute: 4,
+  });
+
+  applyRateLimitHeaders(response, rateLimit);
+
+  if (!rateLimit.allowed) {
+    sendJson(response, 429, {
+      success: false,
+      message: 'Muitas tentativas de login. Aguarde alguns segundos e tente novamente.',
+    });
+    return;
+  }
+
   if (request.method !== 'POST') {
     response.setHeader('Allow', ['POST']);
     sendJson(response, 405, {
