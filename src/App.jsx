@@ -7,6 +7,7 @@ import Usuarios from './pages/Usuarios';
 import ProgressiveBar from './pages/ProgressiveBar';
 import Forms from './pages/Forms';
 import Tables from './pages/Tables';
+import Alerts from './pages/Alerts';
 import ComingSoon from './pages/ComingSoon';
 
 const APP_NAME = 'Testa aí QA - Plataforma de Teste';
@@ -384,7 +385,7 @@ function App() {
       case 'tabelas':
         return <Tables />;
       case 'alerts':
-        return <ComingSoon title="Alertas" description="Interaja com diferentes tipos de alertas" />;
+        return <Alerts />;
       case 'modais':
         return <ComingSoon title="Modais" description="Teste componentes modais e overlays" />;
       default:
