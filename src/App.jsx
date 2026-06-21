@@ -8,7 +8,7 @@ import ProgressiveBar from './pages/ProgressiveBar';
 import Forms from './pages/Forms';
 import Tables from './pages/Tables';
 import Alerts from './pages/Alerts';
-import ComingSoon from './pages/ComingSoon';
+import Modals from './pages/Modals';
 
 const APP_NAME = 'Testa aí QA - Plataforma de Teste';
 const BRAZIL_STATES = [
@@ -387,7 +387,7 @@ function App() {
       case 'alerts':
         return <Alerts />;
       case 'modais':
-        return <ComingSoon title="Modais" description="Teste componentes modais e overlays" />;
+        return <Modals />;
       default:
         return <Home onNavigate={handleNavigation} />;
     }
