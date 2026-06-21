@@ -36,22 +36,22 @@ function validateUserForm(formData) {
   const errors = {};
 
   if (!formData.name.trim()) {
-    errors.name = 'Nome e obrigatorio.';
+    errors.name = 'Nome é obrigatório.';
   }
 
   if (!formData.email.trim()) {
-    errors.email = 'E-mail e obrigatorio.';
+    errors.email = 'E-mail é obrigatório.';
   }
 
   if (formData.cpf && onlyDigits(formData.cpf).length !== 11) {
-    errors.cpf = 'CPF deve ter 11 digitos.';
+    errors.cpf = 'CPF deve ter 11 dígitos.';
   }
 
   if (formData.phone) {
     const phoneLength = onlyDigits(formData.phone).length;
 
     if (phoneLength !== 10 && phoneLength !== 11) {
-      errors.phone = 'Telefone deve ter DDD e 8 ou 9 digitos.';
+      errors.phone = 'Telefone deve ter DDD e 8 ou 9 dígitos.';
     }
   }
 

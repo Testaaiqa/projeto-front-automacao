@@ -18,7 +18,7 @@ export const REQUIRED_REGISTER_FIELDS = [
   ['gender', 'Sexo'],
   ['zipCode', 'CEP'],
   ['street', 'Rua'],
-  ['number', 'Numero'],
+  ['number', 'Número'],
   ['complement', 'Complemento'],
   ['neighborhood', 'Bairro'],
   ['city', 'Cidade'],
@@ -42,11 +42,11 @@ export function validateContactPayload(userData, required = false) {
   const errors = [];
 
   if ((required || userData.cpf) && !validateCpf(userData.cpf)) {
-    errors.push('CPF deve ter 11 digitos.');
+    errors.push('CPF deve ter 11 dígitos.');
   }
 
   if ((required || userData.phone) && !validatePhone(userData.phone)) {
-    errors.push('Telefone deve ter DDD e 8 ou 9 digitos.');
+    errors.push('Telefone deve ter DDD e 8 ou 9 dígitos.');
   }
 
   return errors;
@@ -57,16 +57,12 @@ export function validateRegisterPayload(userData) {
     return !String(userData[fieldName] || '').trim();
   }).map(([, label]) => label);
 
-  if (!userData.callAsMr && !userData.callAsMrs) {
+  if (!userData.callAsMr && !userData.callAsMrs && !userData.callAsOther) {
     missingFields.push('Forma de tratamento');
   }
 
-  if (!userData.acceptTerms) {
-    missingFields.push('Participacao nos fluxos de teste');
-  }
-
-  if (!userData.receiveQaTips) {
-    missingFields.push('Dicas de QA e automacao');
+  if (userData.callAsOther && !String(userData.treatmentOtherText || '').trim()) {
+    missingFields.push('Outro tratamento');
   }
 
   return missingFields;

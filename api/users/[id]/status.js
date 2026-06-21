@@ -5,7 +5,7 @@ export default function handler(request, response) {
     response.setHeader('Allow', ['PATCH']);
     sendJson(response, 405, {
       success: false,
-      message: 'Metodo nao permitido.',
+      message: 'Método não permitido.',
     });
     return;
   }
@@ -18,7 +18,7 @@ export default function handler(request, response) {
   if (userIndex === -1) {
     sendJson(response, 404, {
       success: false,
-      message: 'Usuario nao encontrado.',
+      message: 'Usuário não encontrado.',
     });
     return;
   }
@@ -26,7 +26,7 @@ export default function handler(request, response) {
   if (!['ativo', 'inativo'].includes(status)) {
     sendJson(response, 400, {
       success: false,
-      message: 'Status invalido. Use "ativo" ou "inativo".',
+      message: 'Status inválido. Use "ativo" ou "inativo".',
     });
     return;
   }
@@ -36,7 +36,7 @@ export default function handler(request, response) {
 
   sendJson(response, 200, {
     success: true,
-    message: `Usuario ${status} com sucesso.`,
+    message: `Usuário ${status} com sucesso.`,
     user: users[userIndex],
   });
 }

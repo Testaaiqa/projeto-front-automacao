@@ -8,7 +8,7 @@ export default function handler(request, response) {
   if (userIndex === -1) {
     sendJson(response, 404, {
       success: false,
-      message: 'Usuario nao encontrado.',
+      message: 'Usuário não encontrado.',
     });
     return;
   }
@@ -19,7 +19,7 @@ export default function handler(request, response) {
 
     sendJson(response, 200, {
       success: true,
-      message: 'Usuario deletado com sucesso.',
+      message: 'Usuário deletado com sucesso.',
       user: deletedUser,
     });
     return;
@@ -48,7 +48,7 @@ export default function handler(request, response) {
 
     sendJson(response, 200, {
       success: true,
-      message: 'Usuario atualizado com sucesso.',
+      message: 'Usuário atualizado com sucesso.',
       user: updatedUser,
     });
     return;
@@ -57,6 +57,6 @@ export default function handler(request, response) {
   response.setHeader('Allow', ['DELETE', 'PUT']);
   sendJson(response, 405, {
     success: false,
-    message: 'Metodo nao permitido.',
+    message: 'Método não permitido.',
   });
 }

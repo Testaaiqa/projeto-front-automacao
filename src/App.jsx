@@ -9,33 +9,33 @@ import Forms from './pages/Forms';
 import Tables from './pages/Tables';
 import ComingSoon from './pages/ComingSoon';
 
-const APP_NAME = 'Testa aí QA - Plataforma de Test';
+const APP_NAME = 'Testa aí QA - Plataforma de Teste';
 const BRAZIL_STATES = [
   { value: 'AC', label: 'Acre' },
   { value: 'AL', label: 'Alagoas' },
-  { value: 'AP', label: 'Amapa' },
+  { value: 'AP', label: 'Amapá' },
   { value: 'AM', label: 'Amazonas' },
   { value: 'BA', label: 'Bahia' },
-  { value: 'CE', label: 'Ceara' },
+  { value: 'CE', label: 'Ceará' },
   { value: 'DF', label: 'Distrito Federal' },
-  { value: 'ES', label: 'Espirito Santo' },
-  { value: 'GO', label: 'Goias' },
-  { value: 'MA', label: 'Maranhao' },
+  { value: 'ES', label: 'Espírito Santo' },
+  { value: 'GO', label: 'Goiás' },
+  { value: 'MA', label: 'Maranhão' },
   { value: 'MT', label: 'Mato Grosso' },
   { value: 'MS', label: 'Mato Grosso do Sul' },
   { value: 'MG', label: 'Minas Gerais' },
-  { value: 'PA', label: 'Para' },
-  { value: 'PB', label: 'Paraiba' },
-  { value: 'PR', label: 'Parana' },
+  { value: 'PA', label: 'Pará' },
+  { value: 'PB', label: 'Paraíba' },
+  { value: 'PR', label: 'Paraná' },
   { value: 'PE', label: 'Pernambuco' },
-  { value: 'PI', label: 'Piaui' },
+  { value: 'PI', label: 'Piauí' },
   { value: 'RJ', label: 'Rio de Janeiro' },
   { value: 'RN', label: 'Rio Grande do Norte' },
   { value: 'RS', label: 'Rio Grande do Sul' },
-  { value: 'RO', label: 'Rondonia' },
+  { value: 'RO', label: 'Rondônia' },
   { value: 'RR', label: 'Roraima' },
   { value: 'SC', label: 'Santa Catarina' },
-  { value: 'SP', label: 'Sao Paulo' },
+  { value: 'SP', label: 'São Paulo' },
   { value: 'SE', label: 'Sergipe' },
   { value: 'TO', label: 'Tocantins' },
 ];
@@ -52,13 +52,12 @@ const FIELD_LABELS = {
   treatment: 'Forma de tratamento',
   zipCode: 'CEP',
   street: 'Rua',
-  number: 'Numero',
+  number: 'Número',
   complement: 'Complemento',
   neighborhood: 'Bairro',
   city: 'Cidade',
   state: 'Estado',
-  acceptTerms: 'Participacao nos fluxos de teste',
-  receiveQaTips: 'Dicas de QA e automacao',
+  treatmentOtherText: 'Outro tratamento',
 };
 
 const REGISTER_REQUIRED_FIELDS = [
@@ -78,8 +77,6 @@ const REGISTER_REQUIRED_FIELDS = [
   'neighborhood',
   'city',
   'state',
-  'acceptTerms',
-  'receiveQaTips',
 ];
 
 const SESSION_USER_KEY = 'testa-ai-qa-user';
@@ -140,7 +137,7 @@ function limitBirthDateYear(value) {
 }
 
 function buildRequiredMessage(fieldName) {
-  return `${FIELD_LABELS[fieldName]} e obrigatorio.`;
+  return `${FIELD_LABELS[fieldName]} é obrigatório.`;
 }
 
 function FieldError({ field, errors }) {
@@ -170,6 +167,8 @@ function App() {
     gender: '',
     callAsMr: false,
     callAsMrs: false,
+    callAsOther: false,
+    treatmentOtherText: '',
     zipCode: '',
     street: '',
     number: '',
@@ -211,12 +210,14 @@ function App() {
     setFormData((currentData) => ({
       ...currentData,
       [name]: type === 'checkbox' ? checked : nextValue,
+      ...(name === 'callAsOther' && !checked ? { treatmentOtherText: '' } : {}),
     }));
 
     setFieldErrors((currentErrors) => ({
       ...currentErrors,
       [name]: '',
-      ...(name === 'callAsMr' || name === 'callAsMrs' ? { treatment: '' } : {}),
+      ...(name === 'callAsOther' && !checked ? { treatmentOtherText: '' } : {}),
+      ...(name === 'callAsMr' || name === 'callAsMrs' || name === 'callAsOther' ? { treatment: '' } : {}),
     }));
   }
 
@@ -240,6 +241,8 @@ function App() {
       gender: '',
       callAsMr: false,
       callAsMrs: false,
+      callAsOther: false,
+      treatmentOtherText: '',
       zipCode: '',
       street: '',
       number: '',
@@ -273,15 +276,12 @@ function App() {
 
     REGISTER_REQUIRED_FIELDS.forEach((fieldName) => {
       if (fieldName === 'treatment') {
-        if (!formData.callAsMr && !formData.callAsMrs) {
+        if (!formData.callAsMr && !formData.callAsMrs && !formData.callAsOther) {
           nextErrors.treatment = buildRequiredMessage('treatment');
         }
-        return;
-      }
 
-      if (fieldName === 'acceptTerms' || fieldName === 'receiveQaTips') {
-        if (!formData[fieldName]) {
-          nextErrors[fieldName] = buildRequiredMessage(fieldName);
+        if (formData.callAsOther && !formData.treatmentOtherText.trim()) {
+          nextErrors.treatmentOtherText = buildRequiredMessage('treatmentOtherText');
         }
         return;
       }
@@ -292,14 +292,14 @@ function App() {
     });
 
     if (formData.cpf && onlyDigits(formData.cpf).length !== 11) {
-      nextErrors.cpf = 'CPF deve ter 11 digitos.';
+      nextErrors.cpf = 'CPF deve ter 11 dígitos.';
     }
 
     if (formData.phone) {
       const phoneLength = onlyDigits(formData.phone).length;
 
       if (phoneLength !== 10 && phoneLength !== 11) {
-        nextErrors.phone = 'Telefone deve ter DDD e 8 ou 9 digitos.';
+        nextErrors.phone = 'Telefone deve ter DDD e 8 ou 9 dígitos.';
       }
     }
 
@@ -337,7 +337,7 @@ function App() {
         setSuccessModalUser(result.user);
         setFormMode('login');
       } else {
-        // Redireciona para home após login bem-sucedido
+        // Redireciona para home após login bem-sucedido.
         setTimeout(() => {
           setCurrentPage('home');
           localStorage.setItem(SESSION_PAGE_KEY, 'home');
@@ -346,7 +346,7 @@ function App() {
 
       resetForm();
     } catch (error) {
-      setFeedback('API indisponivel. Rode npm.cmd run api em outro terminal.');
+      setFeedback('API indisponível. Rode npm.cmd run api em outro terminal.');
     } finally {
       setIsLoading(false);
     }
@@ -392,7 +392,7 @@ function App() {
     }
   }
 
-  // Se não está autenticado, mostra tela de login/registro
+  // Se não está autenticado, mostra tela de login/registro.
   if (!loggedUser) {
       return (
         <main className="app-shell" data-testid="app-shell">
@@ -403,7 +403,7 @@ function App() {
           </span>
           <h1 data-testid="app-title">{APP_NAME}</h1>
           <p data-testid="app-subtitle">
-            Aprenda fluxos de automacao com cenarios simples, rastreaveis e prontos para testes.
+            Aprenda fluxos de automação com cenários simples, rastreáveis e prontos para testes.
           </p>
         </div>
 
@@ -562,11 +562,35 @@ function App() {
                   />
                   Quero ser chamada de Senhora
                 </label>
+                <label className="choice-option" data-testid="call-as-other-label">
+                  <input
+                    type="checkbox"
+                    name="callAsOther"
+                    checked={formData.callAsOther}
+                    onChange={handleChange}
+                    data-testid="call-as-other-checkbox"
+                  />
+                  Outro
+                </label>
                 <FieldError field="treatment" errors={fieldErrors} />
+                {formData.callAsOther && (
+                  <label className="span-two" data-testid="treatment-other-field-label">
+                    Outro tratamento
+                    <input
+                      type="text"
+                      name="treatmentOtherText"
+                      value={formData.treatmentOtherText}
+                      onChange={handleChange}
+                      placeholder="Digite a forma de tratamento"
+                      data-testid="treatment-other-input"
+                    />
+                    <FieldError field="treatmentOtherText" errors={fieldErrors} />
+                  </label>
+                )}
               </fieldset>
 
               <div className="section-title" data-testid="address-section-title">
-                Endereco completo
+                Endereço completo
               </div>
 
               <div className="form-grid" data-testid="address-data-section">
@@ -600,7 +624,7 @@ function App() {
                 </label>
 
                 <label data-testid="number-field-label">
-                  Numero
+                  Número
                   <input
                     type="text"
                     name="number"
@@ -619,7 +643,7 @@ function App() {
                     name="complement"
                     value={formData.complement}
                     onChange={handleChange}
-                    placeholder="Apto, bloco"
+                    placeholder="Bloco, Apto, Casa, etc"
                     autoComplete="address-line2"
                     data-testid="complement-input"
                   />
@@ -680,7 +704,7 @@ function App() {
               </div>
 
               <fieldset className="choice-group" data-testid="preferences-fieldset">
-                <legend data-testid="preferences-legend">Preferencias</legend>
+                <legend data-testid="preferences-legend">Preferências</legend>
                 <label className="choice-option" data-testid="terms-label">
                   <input
                     type="checkbox"
@@ -700,7 +724,7 @@ function App() {
                     onChange={handleChange}
                     data-testid="receive-qa-tips-checkbox"
                   />
-                  Quero receber dicas de QA e automacao
+                  Quero receber dicas de QA e automação
                 </label>
                 <FieldError field="receiveQaTips" errors={fieldErrors} />
               </fieldset>
@@ -741,7 +765,7 @@ function App() {
             disabled={isLoading}
             data-testid="submit-auth-button"
           >
-            {isLoading ? 'Aguarde...' : isRegisterMode ? 'Criar usuario' : 'Entrar'}
+            {isLoading ? 'Aguarde...' : isRegisterMode ? 'Criar usuário' : 'Entrar'}
           </button>
         </form>
 
@@ -753,7 +777,7 @@ function App() {
 
         {loggedUser && (
           <div className="logged-user" data-testid="logged-user-card">
-            <strong data-testid="logged-user-title">Usuario autenticado</strong>
+            <strong data-testid="logged-user-title">Usuário autenticado</strong>
             <span data-testid="logged-user-name">{loggedUser.name}</span>
             <span data-testid="logged-user-email">{loggedUser.email}</span>
           </div>
@@ -773,7 +797,7 @@ function App() {
               Cadastro realizado com sucesso
             </h2>
             <p data-testid="success-modal-message">
-              Usuario {successModalUser.name} criado no arquivo users.json.
+              Usuário {successModalUser.name} criado no arquivo users.json.
             </p>
             <button
               className="primary-action"
@@ -790,7 +814,7 @@ function App() {
     );
   }
 
-  // Se está autenticado, mostra dashboard com sidebar
+  // Se está autenticado, mostra dashboard com sidebar.
   return (
     <div className="dashboard-shell" data-testid="dashboard-shell">
       <Sidebar

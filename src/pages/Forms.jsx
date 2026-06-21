@@ -165,7 +165,7 @@ function Forms() {
 
   function lookupZipCode() {
     if (onlyDigits(address.zipCode).length !== 8) {
-      setErrors((current) => ({ ...current, zipCode: 'CEP deve ter 8 digitos.' }));
+      setErrors((current) => ({ ...current, zipCode: 'CEP deve ter 8 dígitos.' }));
       return;
     }
 
@@ -173,7 +173,7 @@ function Forms() {
       ...current,
       street: 'Avenida dos Testes',
       neighborhood: 'Centro QA',
-      city: 'Sao Paulo',
+      city: 'São Paulo',
       state: 'SP',
     }));
   }
@@ -181,24 +181,24 @@ function Forms() {
   function validateForm() {
     const nextErrors = {};
 
-    if (!customer.fullName.trim()) nextErrors.fullName = 'Nome completo e obrigatorio.';
-    if (!customer.email.includes('@')) nextErrors.email = 'Informe um e-mail valido.';
-    if (onlyDigits(customer.cpf).length !== 11) nextErrors.cpf = 'CPF deve ter 11 digitos.';
+    if (!customer.fullName.trim()) nextErrors.fullName = 'Nome completo é obrigatório.';
+    if (!customer.email.includes('@')) nextErrors.email = 'Informe um e-mail válido.';
+    if (onlyDigits(customer.cpf).length !== 11) nextErrors.cpf = 'CPF deve ter 11 dígitos.';
     if (![10, 11].includes(onlyDigits(customer.phone).length)) {
-      nextErrors.phone = 'Telefone deve ter DDD e 8 ou 9 digitos.';
+      nextErrors.phone = 'Telefone deve ter DDD e 8 ou 9 dígitos.';
     }
-    if (!customer.birthDate) nextErrors.birthDate = 'Data de nascimento e obrigatoria.';
-    if (!customer.company.trim()) nextErrors.company = 'Empresa e obrigatoria.';
+    if (!customer.birthDate) nextErrors.birthDate = 'Data de nascimento é obrigatória.';
+    if (!customer.company.trim()) nextErrors.company = 'Empresa é obrigatória.';
     if (!customer.companySize) nextErrors.companySize = 'Selecione o porte da empresa.';
     if (!customer.role) nextErrors.role = 'Selecione o perfil de acesso.';
     if (!customer.terms) nextErrors.terms = 'Aceite os termos para continuar.';
-    if (onlyDigits(address.zipCode).length !== 8) nextErrors.zipCode = 'CEP deve ter 8 digitos.';
-    if (!address.number.trim()) nextErrors.number = 'Numero e obrigatorio.';
-    if (!checkout.cardName.trim()) nextErrors.cardName = 'Nome no cartao e obrigatorio.';
-    if (onlyDigits(checkout.cardNumber).length !== 16) nextErrors.cardNumber = 'Cartao deve ter 16 digitos.';
+    if (onlyDigits(address.zipCode).length !== 8) nextErrors.zipCode = 'CEP deve ter 8 dígitos.';
+    if (!address.number.trim()) nextErrors.number = 'Número é obrigatório.';
+    if (!checkout.cardName.trim()) nextErrors.cardName = 'Nome no cartão é obrigatório.';
+    if (onlyDigits(checkout.cardNumber).length !== 16) nextErrors.cardNumber = 'Cartão deve ter 16 dígitos.';
     if (onlyDigits(checkout.expiry).length !== 4) nextErrors.expiry = 'Validade deve estar em MM/AA.';
-    if (![3, 4].includes(onlyDigits(checkout.cvv).length)) nextErrors.cvv = 'CVV deve ter 3 ou 4 digitos.';
-    if (!fileName) nextErrors.evidence = 'Anexe uma evidencia para o fluxo.';
+    if (![3, 4].includes(onlyDigits(checkout.cvv).length)) nextErrors.cvv = 'CVV deve ter 3 ou 4 dígitos.';
+    if (!fileName) nextErrors.evidence = 'Anexe uma evidência para o fluxo.';
 
     return nextErrors;
   }
@@ -345,7 +345,7 @@ function Forms() {
                 <option value="qa">QA</option>
                 <option value="dev">Dev</option>
                 <option value="product">Produto</option>
-                <option value="manager">Gestao</option>
+                <option value="manager">Gestão</option>
               </select>
               <FieldError message={errors.role} testId="forms-role-error" />
             </label>
@@ -371,7 +371,7 @@ function Forms() {
 
         <section className="form-lab-section">
           <div className="form-lab-heading">
-            <h3>Endereco com CEP</h3>
+            <h3>Endereço com CEP</h3>
             <button type="button" className="secondary-action" onClick={lookupZipCode} data-testid="lookup-cep-btn">
               Buscar CEP
             </button>
@@ -394,7 +394,7 @@ function Forms() {
               <input name="street" value={address.street} onChange={updateAddress} data-testid="forms-street-input" />
             </label>
             <label>
-              Numero
+              Número
               <input name="number" value={address.number} onChange={updateAddress} data-testid="forms-number-input" />
               <FieldError message={errors.number} testId="forms-number-error" />
             </label>
@@ -449,12 +449,12 @@ function Forms() {
               <input name="coupon" value={checkout.coupon} onChange={updateCheckout} placeholder="QA10" data-testid="forms-coupon-input" />
             </label>
             <label>
-              Nome no cartao
+              Nome no cartão
               <input name="cardName" value={checkout.cardName} onChange={updateCheckout} data-testid="forms-card-name-input" />
               <FieldError message={errors.cardName} testId="forms-card-name-error" />
             </label>
             <label>
-              Numero do cartao
+              Número do cartão
               <input
                 name="cardNumber"
                 value={checkout.cardNumber}
@@ -492,7 +492,7 @@ function Forms() {
           </div>
           <div className="form-extras-grid">
             <label className="file-drop">
-              <span>{fileName || 'Selecionar evidencia'}</span>
+              <span>{fileName || 'Selecionar evidência'}</span>
               <input
                 type="file"
                 onChange={(event) => {
@@ -520,7 +520,7 @@ function Forms() {
                   onChange={updateFlag}
                   data-testid="forms-priority-support-checkbox"
                 />
-                Suporte prioritario
+                Suporte prioritário
               </label>
               <label className="choice-option">
                 <input name="terms" type="checkbox" checked={customer.terms} onChange={updateCustomer} data-testid="forms-terms-checkbox" />
@@ -545,7 +545,7 @@ function Forms() {
         <section className="form-result-panel" data-testid="forms-result-panel">
           <h3>Fluxo aprovado</h3>
           <p data-testid="forms-result-summary">
-            {submission.customer} contratou {submission.plan} em {submission.city || 'cidade nao informada'} por R$ {submission.total}.
+            {submission.customer} contratou {submission.plan} em {submission.city || 'cidade não informada'} por R$ {submission.total}.
           </p>
           <div className="result-tags">
             <span>{submission.fileName}</span>

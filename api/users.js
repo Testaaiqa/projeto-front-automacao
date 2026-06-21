@@ -19,7 +19,7 @@ export default function handler(request, response) {
     if (missingFields.length > 0) {
       sendJson(response, 400, {
         success: false,
-        message: `Campos obrigatorios: ${missingFields.join(', ')}.`,
+        message: `Campos obrigatórios: ${missingFields.join(', ')}.`,
       });
       return;
     }
@@ -40,7 +40,7 @@ export default function handler(request, response) {
     if (userAlreadyExists) {
       sendJson(response, 409, {
         success: false,
-        message: 'Ja existe um usuario cadastrado com este e-mail.',
+        message: 'Já existe um usuário cadastrado com este e-mail.',
       });
       return;
     }
@@ -49,7 +49,7 @@ export default function handler(request, response) {
 
     sendJson(response, 201, {
       success: true,
-      message: 'Usuario cadastrado com sucesso. Agora faca login.',
+      message: 'Usuário cadastrado com sucesso. Agora faça login.',
       user: newUser,
     });
     return;
@@ -58,6 +58,6 @@ export default function handler(request, response) {
   response.setHeader('Allow', ['GET', 'POST']);
   sendJson(response, 405, {
     success: false,
-    message: 'Metodo nao permitido.',
+    message: 'Método não permitido.',
   });
 }

@@ -14,7 +14,7 @@ const REQUIRED_REGISTER_FIELDS = [
   ['gender', 'Sexo'],
   ['zipCode', 'CEP'],
   ['street', 'Rua'],
-  ['number', 'Numero'],
+  ['number', 'Número'],
   ['complement', 'Complemento'],
   ['neighborhood', 'Bairro'],
   ['city', 'Cidade'],
@@ -54,16 +54,12 @@ function validateRegisterPayload(userData) {
     return !String(userData[fieldName] || '').trim();
   }).map(([, label]) => label);
 
-  if (!userData.callAsMr && !userData.callAsMrs) {
+  if (!userData.callAsMr && !userData.callAsMrs && !userData.callAsOther) {
     missingFields.push('Forma de tratamento');
   }
 
-  if (!userData.acceptTerms) {
-    missingFields.push('Participacao nos fluxos de teste');
-  }
-
-  if (!userData.receiveQaTips) {
-    missingFields.push('Dicas de QA e automacao');
+  if (userData.callAsOther && !String(userData.treatmentOtherText || '').trim()) {
+    missingFields.push('Outro tratamento');
   }
 
   return missingFields;
@@ -86,11 +82,11 @@ function validateContactPayload(userData, required = false) {
   const errors = [];
 
   if ((required || userData.cpf) && !validateCpf(userData.cpf)) {
-    errors.push('CPF deve ter 11 digitos.');
+    errors.push('CPF deve ter 11 dígitos.');
   }
 
   if ((required || userData.phone) && !validatePhone(userData.phone)) {
-    errors.push('Telefone deve ter DDD e 8 ou 9 digitos.');
+    errors.push('Telefone deve ter DDD e 8 ou 9 dígitos.');
   }
 
   return errors;
@@ -122,7 +118,7 @@ const server = createServer(async (request, response) => {
     if (missingFields.length > 0) {
       sendJson(response, 400, {
         success: false,
-        message: `Campos obrigatorios: ${missingFields.join(', ')}.`,
+        message: `Campos obrigatórios: ${missingFields.join(', ')}.`,
       });
       return;
     }
@@ -143,7 +139,7 @@ const server = createServer(async (request, response) => {
     if (userAlreadyExists) {
       sendJson(response, 409, {
         success: false,
-        message: 'Ja existe um usuario cadastrado com este e-mail.',
+        message: 'Já existe um usuário cadastrado com este e-mail.',
       });
       return;
     }
@@ -160,7 +156,7 @@ const server = createServer(async (request, response) => {
 
     sendJson(response, 201, {
       success: true,
-      message: 'Usuario cadastrado com sucesso. Agora faca login.',
+      message: 'Usuário cadastrado com sucesso. Agora faça login.',
       user: newUser,
     });
     return;
@@ -185,7 +181,7 @@ const server = createServer(async (request, response) => {
     if (!user) {
       sendJson(response, 401, {
         success: false,
-        message: 'Usuario ou senha invalidos.',
+        message: 'Usuário ou senha inválidos.',
       });
       return;
     }
@@ -207,7 +203,7 @@ const server = createServer(async (request, response) => {
     if (userIndex === -1) {
       sendJson(response, 404, {
         success: false,
-        message: 'Usuario nao encontrado.',
+        message: 'Usuário não encontrado.',
       });
       return;
     }
@@ -218,7 +214,7 @@ const server = createServer(async (request, response) => {
 
     sendJson(response, 200, {
       success: true,
-      message: 'Usuario deletado com sucesso.',
+      message: 'Usuário deletado com sucesso.',
       user: deletedUser,
     });
     return;
@@ -234,7 +230,7 @@ const server = createServer(async (request, response) => {
     if (userIndex === -1) {
       sendJson(response, 404, {
         success: false,
-        message: 'Usuario nao encontrado.',
+        message: 'Usuário não encontrado.',
       });
       return;
     }
@@ -260,7 +256,7 @@ const server = createServer(async (request, response) => {
 
     sendJson(response, 200, {
       success: true,
-      message: 'Usuario atualizado com sucesso.',
+      message: 'Usuário atualizado com sucesso.',
       user: updatedUser,
     });
     return;
@@ -276,7 +272,7 @@ const server = createServer(async (request, response) => {
     if (userIndex === -1) {
       sendJson(response, 404, {
         success: false,
-        message: 'Usuario nao encontrado.',
+        message: 'Usuário não encontrado.',
       });
       return;
     }
@@ -284,7 +280,7 @@ const server = createServer(async (request, response) => {
     if (!['ativo', 'inativo'].includes(status)) {
       sendJson(response, 400, {
         success: false,
-        message: 'Status invalido. Use "ativo" ou "inativo".',
+        message: 'Status inválido. Use "ativo" ou "inativo".',
       });
       return;
     }
@@ -294,7 +290,7 @@ const server = createServer(async (request, response) => {
 
     sendJson(response, 200, {
       success: true,
-      message: `Usuario ${status} com sucesso.`,
+      message: `Usuário ${status} com sucesso.`,
       user: users[userIndex],
     });
     return;
@@ -302,13 +298,13 @@ const server = createServer(async (request, response) => {
 
   sendJson(response, 404, {
     success: false,
-    message: 'Rota nao encontrada.',
+    message: 'Rota não encontrada.',
   });
 });
 
 server.on('error', (error) => {
   if (error.code === 'EADDRINUSE') {
-    console.log(`A API ja esta rodando em http://localhost:${PORT}`);
+    console.log(`A API já está rodando em http://localhost:${PORT}`);
     console.log('Use essa API aberta ou feche o outro terminal com Ctrl + C.');
     process.exit(0);
   }

@@ -5,7 +5,7 @@ export default function handler(request, response) {
     response.setHeader('Allow', ['POST']);
     sendJson(response, 405, {
       success: false,
-      message: 'Metodo nao permitido.',
+      message: 'Método não permitido.',
     });
     return;
   }
@@ -27,7 +27,7 @@ export default function handler(request, response) {
   if (!user) {
     sendJson(response, 401, {
       success: false,
-      message: 'Usuario ou senha invalidos.',
+      message: 'Usuário ou senha inválidos.',
     });
     return;
   }
