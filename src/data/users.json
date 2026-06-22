@@ -46,5 +46,29 @@
     "acceptTerms": true,
     "receiveQaTips": true,
     "status": "ativo"
+  },
+    {
+    "id": "cypress-001-qa",
+    "name": "cypress silva",
+    "firstName": "cypress",
+    "lastName": "silva",
+    "email": "cypress.silva@qa.com",
+    "password": "Cypress123@",
+    "cpf": "312.654.987-21",
+    "birthDate": "1994-06-15",
+    "phone": "(81) 99876-5432",
+    "gender": "masculino",
+    "callAsMr": true,
+    "callAsMrs": false,
+    "zipCode": "50710-000",
+    "street": "Rua das Flores",
+    "number": "123",
+    "complement": "Apto 302",
+    "neighborhood": "Boa Viagem",
+    "city": "Recife",
+    "state": "PE",
+    "acceptTerms": true,
+    "receiveQaTips": true,
+    "status": "ativo"
   }
 ]
