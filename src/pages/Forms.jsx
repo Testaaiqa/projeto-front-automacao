@@ -488,7 +488,7 @@ function Forms() {
 
         <section className="form-lab-section">
           <div className="form-lab-heading">
-            <h3>Evidencias e preferencias</h3>
+            <h3>Evidências e preferências</h3>
           </div>
           <div className="form-extras-grid">
             <label className="file-drop">

@@ -57,11 +57,11 @@ export function validateRegisterPayload(userData) {
     return !String(userData[fieldName] || '').trim();
   }).map(([, label]) => label);
 
-  if (!userData.callAsMr && !userData.callAsMrs && !userData.callAsOther) {
+  if (!userData.treatment) {
     missingFields.push('Forma de tratamento');
   }
 
-  if (userData.callAsOther && !String(userData.treatmentOtherText || '').trim()) {
+  if (userData.treatment === 'outro' && !String(userData.treatmentOtherText || '').trim()) {
     missingFields.push('Outro tratamento');
   }
 

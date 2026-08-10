@@ -12,7 +12,7 @@ const SPEED_OPTIONS = {
     step: 2,
   },
   fast: {
-    label: 'Rapida',
+    label: 'Rápida',
     interval: 80,
     step: 3,
   },
@@ -22,7 +22,7 @@ const STATUS_LABELS = {
   idle: 'Pronto',
   running: 'Executando',
   paused: 'Pausado',
-  completed: 'Concluido',
+  completed: 'Concluído',
 };
 
 function ProgressiveBar() {

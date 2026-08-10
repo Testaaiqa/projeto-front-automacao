@@ -1,9 +1,9 @@
 [
   {
     "id": "99052fb5-3c8d-4934-a259-dcdb603d502e",
-    "name": "andre luis",
-    "firstName": "andre",
-    "lastName": "luis",
+    "name": "André Luís",
+    "firstName": "André",
+    "lastName": "Luís",
     "email": "qa2@teste.com",
     "password": "Z5xu_6tBdmN7_Cj",
     "cpf": "090.909.090-90",
@@ -16,7 +16,7 @@
     "street": "Dois",
     "number": "1",
     "complement": "casa",
-    "neighborhood": "Agua fria",
+    "neighborhood": "Água fria",
     "city": "Paulista",
     "state": "PA",
     "acceptTerms": true,

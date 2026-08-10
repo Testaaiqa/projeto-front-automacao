@@ -181,9 +181,7 @@ function App() {
     birthDate: '',
     phone: '',
     gender: '',
-    callAsMr: false,
-    callAsMrs: false,
-    callAsOther: false,
+    treatment: '',
     treatmentOtherText: '',
     zipCode: '',
     street: '',
@@ -237,14 +235,13 @@ function App() {
     setFormData((currentData) => ({
       ...currentData,
       [name]: type === 'checkbox' ? checked : nextValue,
-      ...(name === 'callAsOther' && !checked ? { treatmentOtherText: '' } : {}),
+      ...(name === 'treatment' && value !== 'outro' ? { treatmentOtherText: '' } : {}),
     }));
 
     setFieldErrors((currentErrors) => ({
       ...currentErrors,
       [name]: '',
-      ...(name === 'callAsOther' && !checked ? { treatmentOtherText: '' } : {}),
-      ...(name === 'callAsMr' || name === 'callAsMrs' || name === 'callAsOther' ? { treatment: '' } : {}),
+      ...(name === 'treatment' && value !== 'outro' ? { treatmentOtherText: '' } : {}),
     }));
   }
 
@@ -266,9 +263,7 @@ function App() {
       birthDate: '',
       phone: '',
       gender: '',
-      callAsMr: false,
-      callAsMrs: false,
-      callAsOther: false,
+      treatment: '',
       treatmentOtherText: '',
       zipCode: '',
       street: '',
@@ -303,11 +298,11 @@ function App() {
 
     REGISTER_REQUIRED_FIELDS.forEach((fieldName) => {
       if (fieldName === 'treatment') {
-        if (!formData.callAsMr && !formData.callAsMrs && !formData.callAsOther) {
+        if (!formData.treatment) {
           nextErrors.treatment = buildRequiredMessage('treatment');
         }
 
-        if (formData.callAsOther && !formData.treatmentOtherText.trim()) {
+        if (formData.treatment === 'outro' && !formData.treatmentOtherText.trim()) {
           nextErrors.treatmentOtherText = buildRequiredMessage('treatmentOtherText');
         }
         return;
@@ -581,36 +576,39 @@ function App() {
                 <legend data-testid="treatment-legend">Forma de tratamento</legend>
                 <label className="choice-option" data-testid="call-as-mr-label">
                   <input
-                    type="checkbox"
-                    name="callAsMr"
-                    checked={formData.callAsMr}
+                    type="radio"
+                    name="treatment"
+                    value="sr"
+                    checked={formData.treatment === 'sr'}
                     onChange={handleChange}
-                    data-testid="call-as-mr-checkbox"
+                    data-testid="call-as-mr-radio"
                   />
                   Quero ser chamado de Sr.
                 </label>
                 <label className="choice-option" data-testid="call-as-mrs-label">
                   <input
-                    type="checkbox"
-                    name="callAsMrs"
-                    checked={formData.callAsMrs}
+                    type="radio"
+                    name="treatment"
+                    value="senhora"
+                    checked={formData.treatment === 'senhora'}
                     onChange={handleChange}
-                    data-testid="call-as-mrs-checkbox"
+                    data-testid="call-as-mrs-radio"
                   />
                   Quero ser chamada de Senhora
                 </label>
                 <label className="choice-option" data-testid="call-as-other-label">
                   <input
-                    type="checkbox"
-                    name="callAsOther"
-                    checked={formData.callAsOther}
+                    type="radio"
+                    name="treatment"
+                    value="outro"
+                    checked={formData.treatment === 'outro'}
                     onChange={handleChange}
-                    data-testid="call-as-other-checkbox"
+                    data-testid="call-as-other-radio"
                   />
                   Outro
                 </label>
                 <FieldError field="treatment" errors={fieldErrors} />
-                {formData.callAsOther && (
+                {formData.treatment === 'outro' && (
                   <label className="span-two" data-testid="treatment-other-field-label">
                     Outro tratamento
                     <input

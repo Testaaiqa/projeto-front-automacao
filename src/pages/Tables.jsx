@@ -59,7 +59,7 @@ const INITIAL_ROWS = [
   {
     id: 'QA-1006',
     client: 'LogiTrack',
-    owner: 'Andre Santos',
+    owner: 'André Santos',
     category: 'Performance',
     priority: 'Alta',
     status: 'Concluido',
@@ -70,7 +70,7 @@ const INITIAL_ROWS = [
   {
     id: 'QA-1007',
     client: 'Food Express',
-    owner: 'Lais Martins',
+    owner: 'Laís Martins',
     category: 'Checkout',
     priority: 'Media',
     status: 'Planejado',
@@ -92,7 +92,7 @@ const INITIAL_ROWS = [
   {
     id: 'QA-1009',
     client: 'FinPay',
-    owner: 'Nadia Melo',
+    owner: 'Nádia Melo',
     category: 'Security',
     priority: 'Critica',
     status: 'Em execucao',
@@ -103,7 +103,7 @@ const INITIAL_ROWS = [
   {
     id: 'QA-1010',
     client: 'Market Hub',
-    owner: 'Joao Barros',
+    owner: 'João Barros',
     category: 'Regression',
     priority: 'Baixa',
     status: 'Concluido',
@@ -135,7 +135,7 @@ const INITIAL_ROWS = [
   },
 ];
 
-const STATUS_OPTIONS = ['Todos', 'Planejado', 'Em execucao', 'Bloqueado', 'Concluido'];
+const STATUS_OPTIONS = ['Todos', 'Planejado', 'Em execução', 'Bloqueado', 'Concluído'];
 const CATEGORY_OPTIONS = ['Todas', 'Regression', 'Checkout', 'API', 'Mobile', 'Security', 'Performance'];
 const PAGE_SIZE_OPTIONS = [5, 8, 12];
 
@@ -299,7 +299,7 @@ function Tables() {
             <input
               value={query}
               onChange={updateQuery}
-              placeholder="Cliente, responsavel, status..."
+              placeholder="Cliente, responsável, status..."
               data-testid="table-search-input"
             />
           </label>
@@ -343,16 +343,16 @@ function Tables() {
           <button
             className="secondary-action"
             type="button"
-            onClick={() => applyBulkStatus('Em execucao')}
+            onClick={() => applyBulkStatus('Em execução')}
             disabled={!selectedIds.length}
             data-testid="bulk-running-btn"
           >
-            Marcar em execucao
+            Marcar em execução
           </button>
           <button
             className="secondary-action"
             type="button"
-            onClick={() => applyBulkStatus('Concluido')}
+            onClick={() => applyBulkStatus('Concluído')}
             disabled={!selectedIds.length}
             data-testid="bulk-done-btn"
           >
@@ -379,7 +379,7 @@ function Tables() {
                 {[
                   ['id', 'ID'],
                   ['client', 'Cliente'],
-                  ['owner', 'Responsavel'],
+                  ['owner', 'Responsável'],
                   ['category', 'Categoria'],
                   ['priority', 'Prioridade'],
                   ['status', 'Status'],
@@ -463,7 +463,7 @@ function Tables() {
                         <div className="expanded-content">
                           <strong>{row.client}</strong>
                           <span>Suite: {row.category}</span>
-                          <span>Responsavel: {row.owner}</span>
+                          <span>Responsável: {row.owner}</span>
                           <span>Risco: {row.priority}</span>
                           <span>Resumo: {row.defects} defeito(s), {row.coverage}% de cobertura.</span>
                         </div>
