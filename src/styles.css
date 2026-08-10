@@ -353,6 +353,27 @@ select:focus {
   transition: all 0.3s ease;
 }
 
+.header-back-btn {
+  align-items: center;
+  background: transparent;
+  border: 1px solid #c8d4dc;
+  border-radius: 6px;
+  color: #526071;
+  display: inline-flex;
+  font-size: 13px;
+  font-weight: 700;
+  gap: 6px;
+  min-height: 36px;
+  padding: 6px 10px;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.header-back-btn:hover {
+  background: #f5f7f9;
+  border-color: #126d82;
+  color: #126d82;
+}
+
 .header-title {
   flex: 1;
 }
@@ -2594,9 +2615,23 @@ select:focus {
 }
 
 :root[data-theme="dark"] .mode-actions button,
-:root[data-theme="dark"] .sidebar-close-btn,
-:root[data-theme="dark"] .hamburger-icon {
+:root[data-theme="dark"] .sidebar-close-btn {
   color: #dce7f2;
+}
+
+:root[data-theme="dark"] .hamburger-icon {
+  background: #e7edf5;
+}
+
+:root[data-theme="dark"] .header-back-btn {
+  border-color: #3a4e66;
+  color: #dce7f2;
+}
+
+:root[data-theme="dark"] .header-back-btn:hover {
+  background: #233247;
+  border-color: #67d0e5;
+  color: #67d0e5;
 }
 
 :root[data-theme="dark"] .mode-actions button.active,

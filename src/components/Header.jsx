@@ -1,6 +1,6 @@
 import React from 'react';
 
-function Header({ onMenuToggle, currentUser }) {
+function Header({ onMenuToggle, onBack, showBack, currentUser }) {
   return (
     <header className="header" data-testid="header">
       <div className="header-content">
@@ -14,6 +14,19 @@ function Header({ onMenuToggle, currentUser }) {
           <span className="hamburger-icon"></span>
           <span className="hamburger-icon"></span>
         </button>
+
+        {showBack && (
+          <button
+            className="header-back-btn"
+            type="button"
+            onClick={onBack}
+            data-testid="header-back-button"
+            aria-label="Voltar para a página inicial"
+          >
+            <span aria-hidden="true">←</span>
+            Voltar
+          </button>
+        )}
 
         <div className="header-title">
           <h1 data-testid="header-title">Testa aí QA</h1>

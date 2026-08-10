@@ -864,6 +864,8 @@ function App() {
       <div className="dashboard-content">
         <Header
           onMenuToggle={toggleSidebar}
+          onBack={() => handleNavigation('home')}
+          showBack={currentPage !== 'home'}
           currentUser={loggedUser}
         />
         <main className="page-container" data-testid="page-container">
