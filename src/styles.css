@@ -2719,3 +2719,142 @@ select:focus {
     animation: none;
   }
 }
+
+/* Sistema visual unificado para modais: sempre claro, azul e legível. */
+.modal-backdrop,
+.modal-overlay {
+  backdrop-filter: blur(8px);
+  background: rgba(9, 38, 71, 0.48);
+}
+
+.success-modal,
+.modal-content,
+.app-modal,
+.modal-drawer,
+.app-modal.lightbox {
+  background: linear-gradient(145deg, #ffffff 0%, #f2f9ff 100%);
+  border: 1px solid #b9ddf4;
+  border-radius: 18px;
+  box-shadow: 0 24px 70px rgba(5, 48, 88, 0.3), 0 2px 0 rgba(255, 255, 255, 0.9) inset;
+  color: #111827;
+  position: relative;
+}
+
+.success-modal::before,
+.modal-content::before,
+.app-modal::before,
+.modal-drawer::before {
+  background: linear-gradient(90deg, #075a9b, #1d9ce5 52%, #a4defc);
+  border-radius: 18px 18px 0 0;
+  content: '';
+  height: 5px;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.success-modal,
+.modal-content,
+.app-modal,
+.modal-drawer {
+  padding-top: 34px;
+}
+
+.success-modal h2,
+.modal-content h3,
+.app-modal-header h3,
+.modal-drawer .app-modal-header h3,
+.app-modal.lightbox .app-modal-header h3,
+.modal-detail-grid strong,
+.modal-form-grid label,
+.danger-modal-body strong {
+  color: #111827;
+}
+
+.success-modal p,
+.modal-content p,
+.app-modal-header p,
+.app-modal.lightbox .app-modal-header p,
+.modal-detail-grid span,
+.danger-modal-body p,
+.wizard-content {
+  color: #334155;
+}
+
+.modal-detail-grid,
+.wizard-content,
+.danger-modal-body {
+  background: #eaf6ff;
+  border-color: #b9ddf4;
+  border-radius: 12px;
+}
+
+.modal-form-grid input,
+.modal-form-grid select,
+.modal-form-grid textarea {
+  background: #ffffff;
+  border-color: #a9d3ef;
+  color: #111827;
+}
+
+.app-modal-header button {
+  background: #eaf6ff;
+  border-color: #b9ddf4;
+  color: #075a9b;
+}
+
+.app-modal-header button:hover {
+  background: #d8efff;
+  border-color: #1d9ce5;
+}
+
+.wizard-steps span {
+  background: #eaf6ff;
+  border-color: #b9ddf4;
+  color: #1e4d71;
+}
+
+.wizard-steps span.active {
+  background: #075a9b;
+  border-color: #075a9b;
+  color: #ffffff;
+}
+
+.lightbox-preview {
+  background:
+    linear-gradient(135deg, rgba(7, 90, 155, 0.94), rgba(29, 156, 229, 0.76)),
+    #075a9b;
+  border-color: #80c7ef;
+  border-radius: 12px;
+}
+
+:root[data-theme="dark"] .success-modal,
+:root[data-theme="dark"] .modal-content,
+:root[data-theme="dark"] .app-modal,
+:root[data-theme="dark"] .modal-drawer,
+:root[data-theme="dark"] .app-modal.lightbox,
+:root[data-theme="dark"] .modal-detail-grid,
+:root[data-theme="dark"] .wizard-content,
+:root[data-theme="dark"] .danger-modal-body,
+:root[data-theme="dark"] .modal-form-grid input,
+:root[data-theme="dark"] .modal-form-grid select,
+:root[data-theme="dark"] .modal-form-grid textarea {
+  background-color: #f2f9ff;
+  color: #111827;
+}
+
+:root[data-theme="dark"] .success-modal h2,
+:root[data-theme="dark"] .success-modal p,
+:root[data-theme="dark"] .modal-content h3,
+:root[data-theme="dark"] .modal-content p,
+:root[data-theme="dark"] .app-modal-header h3,
+:root[data-theme="dark"] .app-modal-header p,
+:root[data-theme="dark"] .modal-detail-grid strong,
+:root[data-theme="dark"] .modal-detail-grid span,
+:root[data-theme="dark"] .modal-form-grid label,
+:root[data-theme="dark"] .danger-modal-body strong,
+:root[data-theme="dark"] .danger-modal-body p,
+:root[data-theme="dark"] .wizard-content {
+  color: #111827;
+}
