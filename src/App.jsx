@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { createUser, loginUser } from './services/userService.js';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
@@ -82,6 +82,8 @@ const REGISTER_REQUIRED_FIELDS = [
 
 const SESSION_USER_KEY = 'testa-ai-qa-user';
 const SESSION_PAGE_KEY = 'testa-ai-qa-page';
+const THEME_KEY = 'testa-ai-qa-theme';
+const PAGE_TRANSITION_DURATION = 420;
 
 function readStoredUser() {
   try {
@@ -93,6 +95,10 @@ function readStoredUser() {
 
 function readStoredPage() {
   return localStorage.getItem(SESSION_PAGE_KEY) || 'home';
+}
+
+function readStoredTheme() {
+  return localStorage.getItem(THEME_KEY) === 'dark' ? 'dark' : 'light';
 }
 
 function onlyDigits(value) {
@@ -153,6 +159,15 @@ function FieldError({ field, errors }) {
   );
 }
 
+function PageTransition() {
+  return (
+    <div className="page-transition" role="status" aria-live="polite" data-testid="page-transition">
+      <span className="page-transition-badge">QA</span>
+      <span className="page-transition-text">Carregando...</span>
+    </div>
+  );
+}
+
 function App() {
   const [formMode, setFormMode] = useState('login');
   const [currentPage, setCurrentPage] = useState(() => (readStoredUser() ? readStoredPage() : 'login'));
@@ -185,8 +200,19 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [successModalUser, setSuccessModalUser] = useState(null);
   const [fieldErrors, setFieldErrors] = useState({});
+  const [theme, setTheme] = useState(readStoredTheme);
+  const [isPageTransitioning, setIsPageTransitioning] = useState(false);
 
   const isRegisterMode = formMode === 'register';
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    localStorage.setItem(THEME_KEY, theme);
+  }, [theme]);
+
+  function toggleTheme() {
+    setTheme((currentTheme) => (currentTheme === 'dark' ? 'light' : 'dark'));
+  }
 
   function handleChange(event) {
     const { checked, name, type, value } = event.target;
@@ -339,9 +365,11 @@ function App() {
         setFormMode('login');
       } else {
         // Redireciona para home após login bem-sucedido.
+        setIsPageTransitioning(true);
         setTimeout(() => {
           setCurrentPage('home');
           localStorage.setItem(SESSION_PAGE_KEY, 'home');
+          setIsPageTransitioning(false);
         }, 500);
       }
 
@@ -364,8 +392,16 @@ function App() {
       resetForm();
       return;
     }
-    setCurrentPage(pageId);
-    localStorage.setItem(SESSION_PAGE_KEY, pageId);
+    if (pageId === currentPage || isPageTransitioning) {
+      return;
+    }
+
+    setIsPageTransitioning(true);
+    setTimeout(() => {
+      setCurrentPage(pageId);
+      localStorage.setItem(SESSION_PAGE_KEY, pageId);
+      setIsPageTransitioning(false);
+    }, PAGE_TRANSITION_DURATION);
   }
 
   function toggleSidebar() {
@@ -375,7 +411,7 @@ function App() {
   function renderPageContent() {
     switch (currentPage) {
       case 'home':
-        return <Home onNavigate={handleNavigation} />;
+        return <Home onNavigate={handleNavigation} theme={theme} onToggleTheme={toggleTheme} />;
       case 'usuarios':
         return <Usuarios />;
       case 'progressive-bar':
@@ -389,7 +425,7 @@ function App() {
       case 'modais':
         return <Modals />;
       default:
-        return <Home onNavigate={handleNavigation} />;
+        return <Home onNavigate={handleNavigation} theme={theme} onToggleTheme={toggleTheme} />;
     }
   }
 
@@ -834,6 +870,7 @@ function App() {
           {renderPageContent()}
         </main>
       </div>
+      {isPageTransitioning && <PageTransition />}
     </div>
   );
 }

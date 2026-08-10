@@ -563,6 +563,27 @@ select:focus {
   text-align: center;
 }
 
+.theme-toggle {
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid #c8d4dc;
+  border-radius: 999px;
+  color: #293446;
+  display: inline-flex;
+  font-size: 13px;
+  font-weight: 800;
+  gap: 8px;
+  margin-top: 24px;
+  min-height: 40px;
+  padding: 8px 14px;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.theme-toggle:hover {
+  border-color: #126d82;
+  color: #126d82;
+}
+
 .welcome-content h2 {
   color: #131a26;
   font-size: 32px;
@@ -2494,5 +2515,172 @@ select:focus {
   .users-table th,
   .users-table td {
     padding: 8px 12px;
+  }
+}
+
+/* Tema escuro */
+:root[data-theme="dark"] {
+  background: #101723;
+  color: #e7edf5;
+}
+
+:root[data-theme="dark"] body,
+:root[data-theme="dark"] .dashboard-shell {
+  background: #101723;
+}
+
+:root[data-theme="dark"] .app-shell {
+  background:
+    linear-gradient(135deg, rgba(33, 150, 177, 0.18), transparent 34%),
+    linear-gradient(315deg, rgba(235, 181, 68, 0.12), transparent 38%),
+    #101723;
+}
+
+:root[data-theme="dark"] .auth-panel,
+:root[data-theme="dark"] .header,
+:root[data-theme="dark"] .sidebar,
+:root[data-theme="dark"] .module-card,
+:root[data-theme="dark"] .stat-card,
+:root[data-theme="dark"] .loading-container,
+:root[data-theme="dark"] .form-container,
+:root[data-theme="dark"] .table-container,
+:root[data-theme="dark"] .pb-section,
+:root[data-theme="dark"] .form-lab-section,
+:root[data-theme="dark"] .table-kpi-card,
+:root[data-theme="dark"] .modal-content,
+:root[data-theme="dark"] .success-modal {
+  background: #182231;
+  border-color: #304258;
+}
+
+:root[data-theme="dark"] h1,
+:root[data-theme="dark"] h2,
+:root[data-theme="dark"] h3,
+:root[data-theme="dark"] label,
+:root[data-theme="dark"] .page-header h2,
+:root[data-theme="dark"] .modules-title,
+:root[data-theme="dark"] .module-title,
+:root[data-theme="dark"] .sidebar-user-name,
+:root[data-theme="dark"] .users-table td,
+:root[data-theme="dark"] .pb-section h3,
+:root[data-theme="dark"] .welcome-content h2 {
+  color: #e7edf5;
+}
+
+:root[data-theme="dark"] p,
+:root[data-theme="dark"] .brand-area p,
+:root[data-theme="dark"] .welcome-content p,
+:root[data-theme="dark"] .page-description,
+:root[data-theme="dark"] .module-description,
+:root[data-theme="dark"] .stat-label,
+:root[data-theme="dark"] .header-user-name,
+:root[data-theme="dark"] .sidebar-menu-item,
+:root[data-theme="dark"] .sidebar-user-email,
+:root[data-theme="dark"] .users-table th,
+:root[data-theme="dark"] .success-modal p {
+  color: #aebdce;
+}
+
+:root[data-theme="dark"] input,
+:root[data-theme="dark"] select,
+:root[data-theme="dark"] .mode-actions,
+:root[data-theme="dark"] .secondary-action,
+:root[data-theme="dark"] .speed-btn,
+:root[data-theme="dark"] .action-btn,
+:root[data-theme="dark"] .theme-toggle {
+  background: #111a27;
+  border-color: #3a4e66;
+  color: #e7edf5;
+}
+
+:root[data-theme="dark"] .mode-actions button,
+:root[data-theme="dark"] .sidebar-close-btn,
+:root[data-theme="dark"] .hamburger-icon {
+  color: #dce7f2;
+}
+
+:root[data-theme="dark"] .mode-actions button.active,
+:root[data-theme="dark"] .secondary-action:hover,
+:root[data-theme="dark"] .speed-btn:hover:not(:disabled),
+:root[data-theme="dark"] .action-btn:hover,
+:root[data-theme="dark"] .sidebar-menu-item:hover,
+:root[data-theme="dark"] .sidebar-menu-item.active,
+:root[data-theme="dark"] .users-table thead {
+  background: #233247;
+}
+
+:root[data-theme="dark"] .sidebar-menu-item:hover,
+:root[data-theme="dark"] .sidebar-menu-item.active,
+:root[data-theme="dark"] .theme-toggle:hover {
+  color: #67d0e5;
+}
+
+:root[data-theme="dark"] .home-welcome {
+  border-color: #304258;
+  background:
+    linear-gradient(135deg, rgba(33, 150, 177, 0.18), transparent 34%),
+    linear-gradient(315deg, rgba(235, 181, 68, 0.12), transparent 38%);
+}
+
+:root[data-theme="dark"] .choice-group,
+:root[data-theme="dark"] .section-title,
+:root[data-theme="dark"] .sidebar-header,
+:root[data-theme="dark"] .sidebar-footer,
+:root[data-theme="dark"] .users-table td,
+:root[data-theme="dark"] .users-table thead {
+  border-color: #304258;
+}
+
+.page-transition {
+  align-items: center;
+  backdrop-filter: blur(5px);
+  background: rgba(10, 19, 30, 0.36);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  inset: 0;
+  justify-content: center;
+  position: fixed;
+  z-index: 500;
+}
+
+.page-transition-badge {
+  align-items: center;
+  animation: qa-transition-pulse 0.75s ease-in-out infinite alternate;
+  background: #126d82;
+  border: 3px solid #80d7e7;
+  border-radius: 12px;
+  box-shadow: 0 14px 32px rgba(4, 27, 37, 0.35);
+  color: #ffffff;
+  display: inline-flex;
+  font-size: 20px;
+  font-weight: 900;
+  height: 64px;
+  justify-content: center;
+  letter-spacing: 0.5px;
+  width: 64px;
+}
+
+.page-transition-text {
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+@keyframes qa-transition-pulse {
+  from {
+    opacity: 0.75;
+    transform: scale(0.9) rotate(-4deg);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1.08) rotate(4deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-transition-badge {
+    animation: none;
   }
 }

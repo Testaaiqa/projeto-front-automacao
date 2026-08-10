@@ -1,6 +1,6 @@
 import React from 'react';
 
-function Home({ onNavigate = () => {} }) {
+function Home({ onNavigate = () => {}, theme = 'light', onToggleTheme = () => {} }) {
   const modules = [
     {
       id: 'usuarios',
@@ -55,6 +55,16 @@ function Home({ onNavigate = () => {} }) {
             Aprenda fluxos de automação com cenários simples, rastreáveis e prontos para testes.
           </p>
         </div>
+        <button
+          className="theme-toggle"
+          type="button"
+          onClick={onToggleTheme}
+          aria-pressed={theme === 'dark'}
+          data-testid="theme-toggle-button"
+        >
+          <span aria-hidden="true">{theme === 'dark' ? '☀' : '☾'}</span>
+          {theme === 'dark' ? 'Usar modo claro' : 'Usar modo escuro'}
+        </button>
       </section>
 
       <section className="home-modules">
