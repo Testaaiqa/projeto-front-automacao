@@ -47,7 +47,7 @@
     "receiveQaTips": true,
     "status": "ativo"
   },
-    {
+  {
     "id": "cypress-001-qa",
     "name": "cypress silva",
     "firstName": "cypress",
@@ -70,6 +70,5 @@
     "acceptTerms": true,
     "receiveQaTips": true,
     "status": "ativo"
-  },
-  
+  }
 ]
