@@ -819,32 +819,6 @@ function App() {
         )}
       </section>
 
-      {successModalUser && (
-        <div className="modal-backdrop" role="presentation" data-testid="success-modal-backdrop">
-          <section
-            className="success-modal"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="success-modal-title"
-            data-testid="success-modal"
-          >
-            <h2 id="success-modal-title" data-testid="success-modal-title">
-              Cadastro realizado com sucesso
-            </h2>
-            <p data-testid="success-modal-message">
-              Usuário {successModalUser.name} criado no arquivo users.json.
-            </p>
-            <button
-              className="primary-action"
-              type="button"
-              onClick={closeSuccessModal}
-              data-testid="close-success-modal-button"
-            >
-              Entendi
-            </button>
-          </section>
-        </div>
-      )}
     </main>
     );
   }
@@ -871,6 +845,32 @@ function App() {
         </main>
       </div>
       {isPageTransitioning && <PageTransition />}
+      {successModalUser && (
+        <div className="modal-backdrop" role="presentation" data-testid="success-modal-backdrop">
+          <section
+            className="success-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="success-modal-title"
+            data-testid="success-modal"
+          >
+            <h2 id="success-modal-title" data-testid="success-modal-title">
+              Cadastro realizado com sucesso
+            </h2>
+            <p data-testid="success-modal-message">
+              Usuário {successModalUser.name} criado no arquivo users.json.
+            </p>
+            <button
+              className="primary-action"
+              type="button"
+              onClick={closeSuccessModal}
+              data-testid="close-success-modal-button"
+            >
+              Entendi
+            </button>
+          </section>
+        </div>
+      )}
     </div>
   );
 }
