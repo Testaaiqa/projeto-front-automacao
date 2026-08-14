@@ -25,12 +25,12 @@
   },
   {
     "id": "afb6b4b4-cf41-4a66-995d-42027913c956",
-    "name": "João Silva",
-    "firstName": "João",
-    "lastName": "Silva",
-    "email": "joao.silva@teste.com",
-    "password": "123456",
-    "cpf": "123.456.789-01",
+    "name": "Playwright",
+    "firstName": "Playwright",
+    "lastName": "Automacao",
+    "email": "playwright@qa.com",
+    "password": "Playwright@123",
+    "cpf": "123.456.789-11",
     "birthDate": "1990-01-15",
     "phone": "(11) 98765-4321",
     "gender": "masculino",
@@ -70,5 +70,6 @@
     "acceptTerms": true,
     "receiveQaTips": true,
     "status": "ativo"
-  }
+  },
+  
 ]
