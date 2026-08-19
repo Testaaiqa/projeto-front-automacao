@@ -2,6 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { depositMoney, getBankAccount, requestCreditAnalysis, transferMoney } from '../services/userService.js';
 
 const currency = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+const transactionDateTime = new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
+const TRANSACTIONS_PER_PAGE = 5;
+
+function formatTransactionDate(value) {
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? 'Data não disponível' : transactionDateTime.format(date);
+}
 
 function parseMoneyInput(value) {
   const normalized = String(value).replace(/R\$\s?/g, '').replace(/\./g, '').replace(',', '.');
@@ -36,6 +43,7 @@ function handleUnauthorized(result) {
 function Banking() {
   const [account, setAccount] = useState(null);
   const [transactions, setTransactions] = useState([]);
+  const [currentTransactionsPage, setCurrentTransactionsPage] = useState(1);
   const [recipientEmail, setRecipientEmail] = useState('');
   const [amount, setAmount] = useState('');
   const [depositAmount, setDepositAmount] = useState('');
@@ -58,6 +66,7 @@ function Banking() {
       }
       setAccount(result.account);
       setTransactions(result.transactions || []);
+      setCurrentTransactionsPage(1);
     } catch (loadError) {
       setError('API indisponível. Verifique se o servidor está rodando.');
     } finally {
@@ -138,6 +147,12 @@ function Banking() {
       setIsSubmitting(false);
     }
   }
+
+  const totalTransactionPages = Math.max(1, Math.ceil(transactions.length / TRANSACTIONS_PER_PAGE));
+  const visibleTransactions = transactions.slice(
+    (currentTransactionsPage - 1) * TRANSACTIONS_PER_PAGE,
+    currentTransactionsPage * TRANSACTIONS_PER_PAGE,
+  );
 
   if (isLoading) {
     return <div className="loading-container" data-testid="banking-loading">Carregando conta...</div>;
@@ -220,14 +235,33 @@ function Banking() {
         <div className="banking-history-header"><h3>Movimentações recentes</h3><span>{transactions.length} registros</span></div>
         {transactions.length === 0 ? <p className="banking-empty">Nenhuma movimentação registrada.</p> : (
           <div className="banking-transactions">
-            {transactions.map((transaction) => (
+            {visibleTransactions.map((transaction) => (
               <div className="banking-transaction" key={transaction.id}>
                 <span className={`banking-transaction-mark ${transaction.type === 'TRANSFER_SENT' ? 'sent' : 'received'}`}>{transaction.type === 'TRANSFER_SENT' ? '-' : '+'}</span>
-                <div><strong>{transaction.type === 'DEPOSIT' ? 'Depósito em conta' : transaction.type === 'TRANSFER_RECEIVED' ? 'Transferência recebida' : 'Transferência enviada'}</strong><span>{transaction.description || 'Movimentação bancária'}</span></div>
+                <div>
+                  <strong>{transaction.type === 'DEPOSIT' ? 'Depósito em conta' : transaction.type === 'TRANSFER_RECEIVED' ? 'Transferência recebida' : 'Transferência enviada'}</strong>
+                  {transaction.type === 'TRANSFER_RECEIVED' && transaction.sender?.name && <span>Enviada por: {transaction.sender.name}</span>}
+                  {transaction.type === 'TRANSFER_SENT' && transaction.recipient?.name && <span>Enviada para: {transaction.recipient.name}</span>}
+                  <span>{transaction.description || 'Movimentação bancária'}</span>
+                  <span className="banking-transaction-date">{formatTransactionDate(transaction.createdAt)}</span>
+                </div>
                 <strong className={transaction.type === 'TRANSFER_SENT' ? 'sent-text' : 'received-text'}>{currency.format(Number(transaction.amount))}</strong>
               </div>
             ))}
           </div>
+        )}
+        {transactions.length > TRANSACTIONS_PER_PAGE && (
+          <footer className="banking-history-footer">
+            <nav className="banking-pagination" aria-label="Paginação das movimentações">
+              <button type="button" onClick={() => setCurrentTransactionsPage((page) => page - 1)} disabled={currentTransactionsPage === 1} data-testid="banking-pagination-previous">
+                Anterior
+              </button>
+              <span>Página {currentTransactionsPage} de {totalTransactionPages}</span>
+              <button type="button" onClick={() => setCurrentTransactionsPage((page) => page + 1)} disabled={currentTransactionsPage === totalTransactionPages} data-testid="banking-pagination-next">
+                Próxima
+              </button>
+            </nav>
+          </footer>
         )}
       </section>
     </div>

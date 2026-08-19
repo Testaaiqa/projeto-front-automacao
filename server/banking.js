@@ -10,6 +10,11 @@ function sendError(sendJson, status, message) {
   sendJson(status, { success: false, message });
 }
 
+const transactionParticipants = {
+  sender: { select: { name: true } },
+  recipient: { select: { name: true } },
+};
+
 async function getAccount(userId) {
   return prisma.bankAccount.upsert({ where: { userId }, update: {}, create: { userId, balance: 5000 } });
 }
@@ -29,14 +34,24 @@ export async function handleBankingRequest(request, sendJson, readBody) {
   try {
     if (request.method === 'GET' && path === '/banking/account') {
       const account = await getAccount(userId);
-      const transactions = await prisma.transaction.findMany({ where: { accountId: account.id }, orderBy: { createdAt: 'desc' }, take: 20 });
+      const transactions = await prisma.transaction.findMany({
+        where: { accountId: account.id },
+        include: transactionParticipants,
+        orderBy: { createdAt: 'desc' },
+        take: 20,
+      });
       sendJson(200, { success: true, account: { ...account, balance: money(account.balance), creditLimit: money(account.creditLimit) }, transactions });
       return true;
     }
 
     if (request.method === 'GET' && path === '/banking/transactions') {
       const account = await getAccount(userId);
-      const transactions = await prisma.transaction.findMany({ where: { accountId: account.id }, orderBy: { createdAt: 'desc' }, take: 50 });
+      const transactions = await prisma.transaction.findMany({
+        where: { accountId: account.id },
+        include: transactionParticipants,
+        orderBy: { createdAt: 'desc' },
+        take: 50,
+      });
       sendJson(200, { success: true, transactions });
       return true;
     }

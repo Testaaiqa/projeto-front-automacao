@@ -10,6 +10,7 @@
     "prisma:migrate": "prisma migrate dev --name init-banking",
     "prisma:deploy": "prisma migrate deploy",
     "prisma:seed": "node --env-file=.env prisma/seed.js",
+    "master:create": "node --env-file=.env --env-file=.master.env prisma/create-master.js",
     "build": "prisma generate && prisma migrate deploy && vite build",
     "preview": "vite preview --host 0.0.0.0"
   },
