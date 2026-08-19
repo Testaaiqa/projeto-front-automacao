@@ -70,5 +70,29 @@
     "acceptTerms": true,
     "receiveQaTips": true,
     "status": "ativo"
+  },
+  {
+    "id": "cb04685b-de2a-4d5f-8e56-50ecd01ddffc",
+    "name": "Playwright Frame",
+    "firstName": "Playwright",
+    "lastName": "Frame",
+    "email": "playwright1@qa.com",
+    "password": "Playwright123@",
+    "cpf": "000.000.041-41",
+    "birthDate": "1991-06-26",
+    "phone": "(99) 99999-9999",
+    "gender": "masculino",
+    "treatment": "sr",
+    "treatmentOtherText": "",
+    "zipCode": "11111-111",
+    "street": "R. Noventa e Três",
+    "number": "106",
+    "complement": "casa",
+    "neighborhood": "Maranguape II",
+    "city": "Paulista",
+    "state": "PE",
+    "acceptTerms": true,
+    "receiveQaTips": false,
+    "status": "ativo"
   }
 ]

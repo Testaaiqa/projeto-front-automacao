@@ -6,8 +6,9 @@ import {
   validateRegisterPayload,
 } from './_usersStore.js';
 import { applyRateLimitHeaders, consumeRateLimit } from './_rateLimit.js';
+import { prisma } from '../server/prisma.js';
 
-export default function handler(request, response) {
+export default async function handler(request, response) {
   const isWriteRequest = request.method === 'POST';
   const rateLimit = consumeRateLimit(request, {
     keyPrefix: `users:${request.method}`,
@@ -64,6 +65,22 @@ export default function handler(request, response) {
     }
 
     const newUser = createUser(userData);
+    await prisma.user.create({
+      data: {
+        id: newUser.id,
+        name: newUser.name,
+        firstName: newUser.firstName,
+        lastName: newUser.lastName,
+        email: newUser.email,
+        password: newUser.password,
+        cpf: newUser.cpf,
+        birthDate: newUser.birthDate,
+        phone: newUser.phone,
+        gender: newUser.gender,
+        status: newUser.status || 'ativo',
+        account: { create: {} },
+      },
+    });
 
     sendJson(response, 201, {
       success: true,

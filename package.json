@@ -6,14 +6,19 @@
   "scripts": {
     "dev": "vite --host 0.0.0.0 --port 3000 --strictPort",
     "api": "node server/api.js",
-    "build": "vite build",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev --name init-banking",
+    "prisma:deploy": "prisma migrate deploy",
+    "prisma:seed": "node --env-file=.env prisma/seed.js",
+    "build": "prisma generate && vite build",
     "preview": "vite preview --host 0.0.0.0"
   },
   "dependencies": {
+    "@prisma/client": "^6.19.3",
     "@vitejs/plugin-react": "^5.0.0",
-    "vite": "^7.0.0",
+    "prisma": "^6.19.3",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
-  },
-  "devDependencies": {}
+    "react-dom": "^19.0.0",
+    "vite": "^7.0.0"
+  }
 }

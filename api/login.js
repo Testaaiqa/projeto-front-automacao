@@ -1,7 +1,9 @@
-import { getUsers, sendJson } from './_usersStore.js';
+import { sendJson } from './_usersStore.js';
 import { applyRateLimitHeaders, consumeRateLimit } from './_rateLimit.js';
+import { createAccessToken } from '../server/auth.js';
+import { prisma } from '../server/prisma.js';
 
-export default function handler(request, response) {
+export default async function handler(request, response) {
   const rateLimit = consumeRateLimit(request, {
     keyPrefix: 'login',
     capacity: 8,
@@ -37,11 +39,9 @@ export default function handler(request, response) {
     return;
   }
 
-  const user = getUsers().find(
-    (currentUser) => currentUser.email === email && currentUser.password === password,
-  );
+  const user = await prisma.user.findUnique({ where: { email } });
 
-  if (!user) {
+  if (!user || user.password !== password) {
     sendJson(response, 401, {
       success: false,
       message: 'Usuário ou senha inválidos.',
@@ -53,5 +53,6 @@ export default function handler(request, response) {
     success: true,
     message: 'Login realizado com sucesso.',
     user,
+    accessToken: createAccessToken(user.id),
   });
 }

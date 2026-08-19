@@ -4,6 +4,7 @@ import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import Home from './pages/Home';
 import Usuarios from './pages/Usuarios';
+import Banking from './pages/Banking';
 import ProgressiveBar from './pages/ProgressiveBar';
 import Forms from './pages/Forms';
 import Tables from './pages/Tables';
@@ -82,12 +83,12 @@ const REGISTER_REQUIRED_FIELDS = [
 
 const SESSION_USER_KEY = 'testa-ai-qa-user';
 const SESSION_PAGE_KEY = 'testa-ai-qa-page';
-const THEME_KEY = 'testa-ai-qa-theme';
 const PAGE_TRANSITION_DURATION = 420;
 
 function readStoredUser() {
   try {
-    return JSON.parse(localStorage.getItem(SESSION_USER_KEY));
+    const storedUser = JSON.parse(localStorage.getItem(SESSION_USER_KEY));
+    return storedUser && localStorage.getItem('testa-ai-qa-access-token') ? storedUser : null;
   } catch (error) {
     return null;
   }
@@ -95,10 +96,6 @@ function readStoredUser() {
 
 function readStoredPage() {
   return localStorage.getItem(SESSION_PAGE_KEY) || 'home';
-}
-
-function readStoredTheme() {
-  return localStorage.getItem(THEME_KEY) === 'dark' ? 'dark' : 'light';
 }
 
 function onlyDigits(value) {
@@ -198,19 +195,29 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [successModalUser, setSuccessModalUser] = useState(null);
   const [fieldErrors, setFieldErrors] = useState({});
-  const [theme, setTheme] = useState(readStoredTheme);
   const [isPageTransitioning, setIsPageTransitioning] = useState(false);
 
   const isRegisterMode = formMode === 'register';
 
   useEffect(() => {
-    document.documentElement.dataset.theme = theme;
-    localStorage.setItem(THEME_KEY, theme);
-  }, [theme]);
+    document.documentElement.dataset.theme = 'dark';
+    localStorage.removeItem('testa-ai-qa-theme');
+  }, []);
 
-  function toggleTheme() {
-    setTheme((currentTheme) => (currentTheme === 'dark' ? 'light' : 'dark'));
-  }
+  useEffect(() => {
+    function handleAuthExpired() {
+      setLoggedUser(null);
+      setCurrentPage('login');
+      localStorage.removeItem(SESSION_USER_KEY);
+      localStorage.removeItem('testa-ai-qa-access-token');
+      localStorage.removeItem(SESSION_PAGE_KEY);
+      setFeedback('Sua sessão expirou. Faça login novamente.');
+      setFormMode('login');
+    }
+
+    window.addEventListener('auth-expired', handleAuthExpired);
+    return () => window.removeEventListener('auth-expired', handleAuthExpired);
+  }, []);
 
   function handleChange(event) {
     const { checked, name, type, value } = event.target;
@@ -353,6 +360,9 @@ function App() {
 
       setLoggedUser(result.user);
       localStorage.setItem(SESSION_USER_KEY, JSON.stringify(result.user));
+      if (result.accessToken) {
+        localStorage.setItem('testa-ai-qa-access-token', result.accessToken);
+      }
       setFeedback(result.message);
 
       if (isRegisterMode) {
@@ -381,6 +391,7 @@ function App() {
       setLoggedUser(null);
       setCurrentPage('login');
       localStorage.removeItem(SESSION_USER_KEY);
+      localStorage.removeItem('testa-ai-qa-access-token');
       localStorage.removeItem(SESSION_PAGE_KEY);
       setFeedback('');
       setFormMode('login');
@@ -406,9 +417,11 @@ function App() {
   function renderPageContent() {
     switch (currentPage) {
       case 'home':
-        return <Home onNavigate={handleNavigation} theme={theme} onToggleTheme={toggleTheme} />;
+        return <Home onNavigate={handleNavigation} />;
       case 'usuarios':
         return <Usuarios />;
+      case 'banking':
+        return <Banking />;
       case 'progressive-bar':
         return <ProgressiveBar />;
       case 'forms':
@@ -420,7 +433,7 @@ function App() {
       case 'modais':
         return <Modals />;
       default:
-        return <Home onNavigate={handleNavigation} theme={theme} onToggleTheme={toggleTheme} />;
+        return <Home onNavigate={handleNavigation} />;
     }
   }
 

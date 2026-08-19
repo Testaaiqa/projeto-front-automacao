@@ -1,6 +1,6 @@
 import React from 'react';
 
-function Home({ onNavigate = () => {}, theme = 'light', onToggleTheme = () => {} }) {
+function Home({ onNavigate = () => {} }) {
   const modules = [
     {
       id: 'usuarios',
@@ -8,6 +8,13 @@ function Home({ onNavigate = () => {}, theme = 'light', onToggleTheme = () => {}
       description: 'Gerencie usuários da plataforma',
       icon: '👥',
       color: '#126d82',
+    },
+    {
+      id: 'banking',
+      title: 'Banco QA',
+      description: 'Teste saldo, transferências e análise de crédito',
+      icon: '▣',
+      color: '#17483d',
     },
     {
       id: 'progressive-bar',
@@ -55,16 +62,6 @@ function Home({ onNavigate = () => {}, theme = 'light', onToggleTheme = () => {}
             Aprenda fluxos de automação com cenários simples, rastreáveis e prontos para testes.
           </p>
         </div>
-        <button
-          className="theme-toggle"
-          type="button"
-          onClick={onToggleTheme}
-          aria-pressed={theme === 'dark'}
-          data-testid="theme-toggle-button"
-        >
-          <span aria-hidden="true">{theme === 'dark' ? '☀' : '☾'}</span>
-          {theme === 'dark' ? 'Usar modo claro' : 'Usar modo escuro'}
-        </button>
       </section>
 
       <section className="home-modules">
@@ -96,7 +93,7 @@ function Home({ onNavigate = () => {}, theme = 'light', onToggleTheme = () => {}
       <section className="home-stats">
         <div className="stats-container">
           <div className="stat-card">
-            <div className="stat-value">6</div>
+            <div className="stat-value">7</div>
             <div className="stat-label">Módulos</div>
           </div>
           <div className="stat-card">

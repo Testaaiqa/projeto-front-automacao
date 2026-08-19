@@ -1,5 +1,45 @@
 const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '/api' : 'http://localhost:3001');
 
+const ACCESS_TOKEN_KEY = 'testa-ai-qa-access-token';
+
+export function getAccessToken() {
+  return localStorage.getItem(ACCESS_TOKEN_KEY);
+}
+
+export async function getBankAccount() {
+  const response = await fetch(`${API_URL}/banking/account`, {
+    headers: { Authorization: `Bearer ${getAccessToken()}` },
+  });
+  return response.json();
+}
+
+export async function transferMoney(recipientEmail, amount, description = '') {
+  const response = await fetch(`${API_URL}/banking/transfers`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getAccessToken()}` },
+    body: JSON.stringify({ recipientEmail, amount, description }),
+  });
+  return response.json();
+}
+
+export async function depositMoney(amount, description = 'Depósito para testes') {
+  const response = await fetch(`${API_URL}/banking/deposits`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getAccessToken()}` },
+    body: JSON.stringify({ amount, description }),
+  });
+  return response.json();
+}
+
+export async function requestCreditAnalysis(requestedLimit) {
+  const response = await fetch(`${API_URL}/banking/credit-analysis`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getAccessToken()}` },
+    body: JSON.stringify({ requestedLimit }),
+  });
+  return response.json();
+}
+
 export async function loginUser(email, password) {
   if (!email || !password) {
     return {

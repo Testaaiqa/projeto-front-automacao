@@ -12,6 +12,21 @@ Execute o comando abaixo na raiz do projeto:
 npm install
 ```
 
+## Banco Neon com Prisma
+
+Copie `.env.example` para `.env` e preencha `DATABASE_URL` com a connection string do Neon. Defina também um `AUTH_SECRET` exclusivo para os tokens de login.
+
+Depois execute:
+
+```bash
+npx prisma generate
+npm.cmd run prisma:migrate
+```
+
+Para produção, configure `DATABASE_URL` e `AUTH_SECRET` nas variáveis de ambiente do Vercel e execute `npm run prisma:deploy` em um ambiente de CI ou local conectado ao Neon antes do deploy. Não coloque a connection string no repositório.
+
+O módulo bancário usa as rotas autenticadas `GET /banking/account`, `GET /banking/transactions`, `POST /banking/transfers` e `POST /banking/credit-analysis`. Envie o token retornado pelo login como `Authorization: Bearer <accessToken>`.
+
 ---
 
 # 🔥 Subindo o BACK-END (API)

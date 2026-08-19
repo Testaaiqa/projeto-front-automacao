@@ -1,0 +1,79 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                   String           @id
+  name                 String
+  firstName            String?
+  lastName             String?
+  email                String           @unique
+  password             String
+  cpf                  String?
+  birthDate            String?
+  phone                String?
+  gender               String?
+  status               String           @default("ativo")
+  account              BankAccount?
+  sentTransactions     Transaction[]    @relation("TransactionSender")
+  receivedTransactions Transaction[]    @relation("TransactionRecipient")
+  creditAnalyses       CreditAnalysis[]
+  createdAt            DateTime         @default(now())
+  updatedAt            DateTime         @updatedAt
+}
+
+model BankAccount {
+  id           String        @id @default(uuid())
+  userId       String        @unique
+  balance      Decimal       @default(5000) @db.Decimal(15, 2)
+  creditLimit  Decimal       @default(0) @db.Decimal(15, 2)
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model Transaction {
+  id          String          @id @default(uuid())
+  accountId   String
+  senderId    String?
+  recipientId String?
+  type        TransactionType
+  amount      Decimal         @db.Decimal(15, 2)
+  description String?
+  account     BankAccount     @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  sender      User?           @relation("TransactionSender", fields: [senderId], references: [id])
+  recipient   User?           @relation("TransactionRecipient", fields: [recipientId], references: [id])
+  createdAt   DateTime        @default(now())
+
+  @@index([accountId, createdAt])
+}
+
+model CreditAnalysis {
+  id             String               @id @default(uuid())
+  userId         String
+  requestedLimit Decimal              @db.Decimal(15, 2)
+  approvedLimit  Decimal?             @db.Decimal(15, 2)
+  status         CreditAnalysisStatus
+  score          Int
+  user           User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt      DateTime             @default(now())
+
+  @@index([userId, createdAt])
+}
+
+enum TransactionType {
+  DEPOSIT
+  TRANSFER_SENT
+  TRANSFER_RECEIVED
+}
+
+enum CreditAnalysisStatus {
+  APPROVED
+  DENIED
+}

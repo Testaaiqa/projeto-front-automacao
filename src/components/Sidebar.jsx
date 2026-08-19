@@ -13,6 +13,11 @@ function Sidebar({ isOpen, onClose, onNavigate, currentPage, currentUser }) {
       icon: '👥',
     },
     {
+      id: 'banking',
+      label: 'Banco QA',
+      icon: '▣',
+    },
+    {
       id: 'progressive-bar',
       label: 'Progressive Bar',
       icon: '📊',

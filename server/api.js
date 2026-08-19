@@ -2,6 +2,9 @@ import { createServer } from 'node:http';
 import { randomUUID } from 'node:crypto';
 import { readUsers, writeUsers } from './database.js';
 import { applyRateLimitHeaders, consumeRateLimit } from '../api/_rateLimit.js';
+import { createAccessToken } from './auth.js';
+import { handleBankingRequest } from './banking.js';
+import { prisma } from './prisma.js';
 
 const PORT = 3001;
 const REQUIRED_REGISTER_FIELDS = [
@@ -26,7 +29,7 @@ function sendJson(response, statusCode, body) {
   response.writeHead(statusCode, {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     'Content-Type': 'application/json',
   });
   response.end(JSON.stringify(body));
@@ -131,7 +134,7 @@ const server = createServer(async (request, response) => {
     response.writeHead(204, {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     });
     response.end();
     return;
@@ -145,6 +148,16 @@ const server = createServer(async (request, response) => {
       success: false,
       message: 'Muitas requisições. Aguarde alguns segundos e tente novamente.',
     });
+    return;
+  }
+
+  const bankingHandled = await handleBankingRequest(
+    request,
+    (statusCode, body) => sendJson(response, statusCode, body),
+    () => readRequestBody(request),
+  );
+
+  if (bankingHandled) {
     return;
   }
 
@@ -197,6 +210,22 @@ const server = createServer(async (request, response) => {
     };
 
     await writeUsers([...users, newUser]);
+    await prisma.user.create({
+      data: {
+        id: newUser.id,
+        name: newUser.name,
+        firstName,
+        lastName,
+        email,
+        password,
+        cpf: newUser.cpf,
+        birthDate: newUser.birthDate,
+        phone: newUser.phone,
+        gender: newUser.gender,
+        status: newUser.status || 'ativo',
+        account: { create: {} },
+      },
+    });
 
     sendJson(response, 201, {
       success: true,
@@ -234,6 +263,7 @@ const server = createServer(async (request, response) => {
       success: true,
       message: 'Login realizado com sucesso.',
       user,
+      accessToken: createAccessToken(user.id),
     });
     return;
   }
