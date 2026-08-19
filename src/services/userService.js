@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '/api' : 'http://localhost:3001');
+const API_URL = import.meta.env.PROD ? '/api' : (import.meta.env.VITE_API_URL || 'http://localhost:3001');
 
 const ACCESS_TOKEN_KEY = 'testa-ai-qa-access-token';
 
@@ -6,11 +6,19 @@ export function getAccessToken() {
   return localStorage.getItem(ACCESS_TOKEN_KEY);
 }
 
+async function readApiResponse(response) {
+  const body = await response.json().catch(() => ({}));
+  return response.ok ? body : {
+    success: false,
+    message: body.message || `API respondeu com status ${response.status}.`,
+  };
+}
+
 export async function getBankAccount() {
   const response = await fetch(`${API_URL}/banking/account`, {
     headers: { Authorization: `Bearer ${getAccessToken()}` },
   });
-  return response.json();
+  return readApiResponse(response);
 }
 
 export async function transferMoney(recipientEmail, amount, description = '') {
@@ -19,7 +27,7 @@ export async function transferMoney(recipientEmail, amount, description = '') {
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getAccessToken()}` },
     body: JSON.stringify({ recipientEmail, amount, description }),
   });
-  return response.json();
+  return readApiResponse(response);
 }
 
 export async function depositMoney(amount, description = 'Depósito para testes') {
@@ -28,7 +36,7 @@ export async function depositMoney(amount, description = 'Depósito para testes'
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getAccessToken()}` },
     body: JSON.stringify({ amount, description }),
   });
-  return response.json();
+  return readApiResponse(response);
 }
 
 export async function requestCreditAnalysis(requestedLimit) {
@@ -37,7 +45,7 @@ export async function requestCreditAnalysis(requestedLimit) {
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getAccessToken()}` },
     body: JSON.stringify({ requestedLimit }),
   });
-  return response.json();
+  return readApiResponse(response);
 }
 
 export async function loginUser(email, password) {
@@ -56,7 +64,7 @@ export async function loginUser(email, password) {
     body: JSON.stringify({ email, password }),
   });
 
-  return response.json();
+  return readApiResponse(response);
 }
 
 export async function createUser(userData) {
@@ -77,7 +85,7 @@ export async function createUser(userData) {
     body: JSON.stringify(userData),
   });
 
-  return response.json();
+  return readApiResponse(response);
 }
 
 export async function getAllUsers() {
