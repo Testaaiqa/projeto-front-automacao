@@ -23,7 +23,7 @@ npx prisma generate
 npm.cmd run prisma:migrate
 ```
 
-Para produção, configure `DATABASE_URL` e `AUTH_SECRET` nas variáveis de ambiente do Vercel e execute `npm run prisma:deploy` em um ambiente de CI ou local conectado ao Neon antes do deploy. Não coloque a connection string no repositório.
+Para produção, configure `DATABASE_URL` e `AUTH_SECRET` nas variáveis de ambiente do Vercel. O comando de build executa `prisma migrate deploy` antes de gerar o front-end, portanto as migrações são aplicadas no banco configurado para aquele ambiente. Não coloque a connection string no repositório.
 
 O módulo bancário usa as rotas autenticadas `GET /banking/account`, `GET /banking/transactions`, `POST /banking/transfers` e `POST /banking/credit-analysis`. Envie o token retornado pelo login como `Authorization: Bearer <accessToken>`.
 
