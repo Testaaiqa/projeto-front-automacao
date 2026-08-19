@@ -20,7 +20,7 @@ export function createAccessToken(userId) {
 }
 
 export function getAuthenticatedUserId(request) {
-  const header = request.headers.authorization || '';
+  const header = request.headers?.authorization || '';
   const [scheme, token] = header.split(' ');
   if (scheme !== 'Bearer' || !token) return null;
 

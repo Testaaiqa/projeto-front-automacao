@@ -12,8 +12,13 @@ export default async function handler(request, response) {
       ? queryPath.join('/')
       : queryPath || urlPath;
 
+    // `request` é um objeto do runtime do Vercel. Propriedades como
+    // `headers` podem vir do protótipo e não são preservadas por `{ ...request }`.
+    // Encaminhe explicitamente os dados usados pelo módulo bancário para que o
+    // token Bearer chegue à validação de autenticação.
     const bankingRequest = {
-      ...request,
+      method: request.method,
+      headers: request.headers || {},
       url: `/banking/${routePath}`,
     };
 
