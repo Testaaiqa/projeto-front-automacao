@@ -5,6 +5,7 @@ import Header from './components/Header';
 import Home from './pages/Home';
 import Usuarios from './pages/Usuarios';
 import Banking from './pages/Banking';
+import MasterReset from './pages/MasterReset';
 import ProgressiveBar from './pages/ProgressiveBar';
 import Forms from './pages/Forms';
 import Tables from './pages/Tables';
@@ -388,14 +389,7 @@ function App() {
 
   function handleNavigation(pageId) {
     if (pageId === 'logout') {
-      setLoggedUser(null);
-      setCurrentPage('login');
-      localStorage.removeItem(SESSION_USER_KEY);
-      localStorage.removeItem('testa-ai-qa-access-token');
-      localStorage.removeItem(SESSION_PAGE_KEY);
-      setFeedback('');
-      setFormMode('login');
-      resetForm();
+      handleLogout();
       return;
     }
     if (pageId === currentPage || isPageTransitioning) {
@@ -408,6 +402,17 @@ function App() {
       localStorage.setItem(SESSION_PAGE_KEY, pageId);
       setIsPageTransitioning(false);
     }, PAGE_TRANSITION_DURATION);
+  }
+
+  function handleLogout() {
+    setLoggedUser(null);
+    setCurrentPage('login');
+    localStorage.removeItem(SESSION_USER_KEY);
+    localStorage.removeItem('testa-ai-qa-access-token');
+    localStorage.removeItem(SESSION_PAGE_KEY);
+    setFeedback('');
+    setFormMode('login');
+    resetForm();
   }
 
   function toggleSidebar() {
@@ -834,6 +839,10 @@ function App() {
 
     </main>
     );
+  }
+
+  if (loggedUser.status === 'master') {
+    return <MasterReset currentUser={loggedUser} onLogout={handleLogout} />;
   }
 
   // Se está autenticado, mostra dashboard com sidebar.

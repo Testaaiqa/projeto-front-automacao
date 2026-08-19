@@ -840,6 +840,122 @@ select:focus {
 .received-text { color: #17483d; }
 .sent-text { color: #b42318; }
 
+.master-reset-page {
+  align-items: center;
+  background: linear-gradient(135deg, #101723, #17283a);
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 24px;
+}
+
+.master-reset-card {
+  background: #ffffff;
+  border: 1px solid #d9e2e8;
+  border-radius: 14px;
+  box-shadow: 0 20px 44px rgba(3, 17, 31, 0.24);
+  max-width: 620px;
+  padding: 32px;
+  width: 100%;
+}
+
+.master-reset-header {
+  align-items: center;
+  display: flex;
+  gap: 16px;
+}
+
+.master-reset-badge {
+  align-items: center;
+  background: #6a1b1b;
+  border-radius: 12px;
+  color: #ffffff;
+  display: inline-flex;
+  font-size: 22px;
+  font-weight: 900;
+  height: 52px;
+  justify-content: center;
+  width: 52px;
+}
+
+.master-reset-eyebrow {
+  color: #9b6d00;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.master-reset-header h1,
+.master-reset-instructions h2 {
+  color: #1d2433;
+  margin: 4px 0;
+}
+
+.master-reset-header p,
+.master-reset-instructions p {
+  color: #687386;
+  margin: 6px 0 0;
+}
+
+.master-reset-instructions {
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-radius: 10px;
+  margin: 28px 0;
+  padding: 18px;
+}
+
+.master-reset-instructions h2 {
+  font-size: 16px;
+}
+
+.master-reset-form {
+  display: grid;
+  gap: 14px;
+}
+
+.master-reset-form label {
+  color: #3d4758;
+  display: grid;
+  gap: 8px;
+}
+
+.master-reset-form input {
+  border: 1px solid #c8d4dc;
+  border-radius: 7px;
+  font: inherit;
+  padding: 11px 12px;
+}
+
+.master-reset-action {
+  background: #a32929;
+  border: 1px solid #a32929;
+  border-radius: 7px;
+  color: #ffffff;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 800;
+  padding: 12px;
+}
+
+.master-reset-action:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.master-logout {
+  background: transparent;
+  border: 0;
+  color: #687386;
+  cursor: pointer;
+  display: block;
+  font: inherit;
+  margin: 24px auto 0;
+  text-decoration: underline;
+}
+
 .banking-transaction > .received-text,
 .banking-transaction > .sent-text {
   text-align: center;

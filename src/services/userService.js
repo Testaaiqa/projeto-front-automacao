@@ -48,6 +48,15 @@ export async function requestCreditAnalysis(requestedLimit) {
   return readApiResponse(response);
 }
 
+export async function resetPlatform(confirmation) {
+  const response = await fetch(`${API_URL}/admin/reset`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getAccessToken()}` },
+    body: JSON.stringify({ confirmation }),
+  });
+  return readApiResponse(response);
+}
+
 export async function loginUser(email, password) {
   if (!email || !password) {
     return {
