@@ -169,7 +169,7 @@ function Banking() {
         </div>
       </section>
 
-      <p className="banking-note">O saldo começa em zero. Para testar transferências, adicione saldo para sua própria conta abaixo.</p>
+      <p className="banking-note">Adicione saldo para sua própria conta abaixo.</p>
 
       <div className="banking-grid">
         <section className="form-container">
