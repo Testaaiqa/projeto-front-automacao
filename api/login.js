@@ -39,7 +39,18 @@ export default async function handler(request, response) {
     return;
   }
 
-  const user = await prisma.user.findUnique({ where: { email } });
+  let user;
+
+  try {
+    user = await prisma.user.findUnique({ where: { email } });
+  } catch (error) {
+    console.error('Falha ao consultar usuário no Neon:', error);
+    sendJson(response, 503, {
+      success: false,
+      message: 'Banco de dados indisponível. Verifique DATABASE_URL no Vercel.',
+    });
+    return;
+  }
 
   if (!user || user.password !== password) {
     sendJson(response, 401, {
