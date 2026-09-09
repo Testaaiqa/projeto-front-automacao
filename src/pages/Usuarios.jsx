@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getAllUsers, deleteUser, updateUser, toggleUserStatus } from '../services/userService.js';
+import { createUser, getAllUsers, deleteUser, updateUser, toggleUserStatus } from '../services/userService.js';
 
 function onlyDigits(value) {
   return String(value || '').replace(/\D/g, '');
@@ -230,22 +230,32 @@ function Usuarios() {
         setError(result.message);
       }
     } else {
-      // Modo novo usuário
-      const newUser = {
-        id: Date.now().toString(),
-        ...formData,
+      const payload = {
+        firstName: formData.firstName || formData.name.split(' ')[0] || '',
+        lastName: formData.lastName || formData.name.split(' ').slice(1).join(' ') || '',
+        name: formData.name,
+        email: formData.email,
+        password: '123456',
+        cpf: formData.cpf || undefined,
+        phone: formData.phone || undefined,
         status: 'ativo',
       };
-      setUsers([...users, newUser]);
-      setFormData({
-        name: '',
-        email: '',
-        cpf: '',
-        phone: '',
-        firstName: '',
-        lastName: '',
-      });
-      setShowForm(false);
+
+      const result = await createUser(payload);
+      if (result.success) {
+        setFormData({
+          name: '',
+          email: '',
+          cpf: '',
+          phone: '',
+          firstName: '',
+          lastName: '',
+        });
+        setShowForm(false);
+        await loadUsers();
+      } else {
+        setError(result.message || 'Não foi possível cadastrar o usuário.');
+      }
     }
   };
 

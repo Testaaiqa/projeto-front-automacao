@@ -8,7 +8,7 @@ test('normalizes email to lowercase', () => {
   assert.equal(normalizeEmail('  User@Teste.com  '), 'user@teste.com');
 });
 
-test('remove sensitive fields from public user payloads', () => {
+test('exposes only cpf and phone in public user payloads', () => {
   const user = {
     id: 'user-1',
     firstName: 'Ana',
@@ -25,9 +25,9 @@ test('remove sensitive fields from public user payloads', () => {
   const safeUser = sanitizeUser(user);
 
   assert.deepEqual(safeUser.password, undefined);
-  assert.deepEqual(safeUser.cpf, undefined);
+  assert.equal(safeUser.cpf, '12345678909');
+  assert.equal(safeUser.phone, '(11) 99999-9999');
   assert.deepEqual(safeUser.birthDate, undefined);
-  assert.deepEqual(safeUser.phone, undefined);
   assert.deepEqual(safeUser.gender, undefined);
   assert.equal(safeUser.email, 'ana@email.com');
   assert.equal(safeUser.name, 'Ana Silva');
@@ -46,5 +46,5 @@ test('master users never appear in user lists', () => {
   assert.equal(visibleUsers.length, 1);
   assert.equal(visibleUsers[0].email, 'normal@email.com');
   assert.equal(visibleUsers[0].password, undefined);
-  assert.equal(visibleUsers[0].cpf, undefined);
+  assert.equal(visibleUsers[0].cpf, '-');
 });

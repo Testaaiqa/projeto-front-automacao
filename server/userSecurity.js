@@ -20,9 +20,7 @@ export function sanitizeUser(user) {
 
   const {
     password,
-    cpf,
     birthDate,
-    phone,
     gender,
     createdAt,
     updatedAt,
@@ -36,6 +34,8 @@ export function sanitizeUser(user) {
     firstName: safeUser.firstName || '',
     lastName: safeUser.lastName || '',
     email: safeUser.email,
+    cpf: safeUser.cpf || '-',
+    phone: safeUser.phone || '-',
     role: safeUser.role || (safeUser.status === 'master' ? 'admin' : 'common'),
     status: safeUser.status || 'ativo',
   };
