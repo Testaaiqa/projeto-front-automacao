@@ -3087,6 +3087,49 @@ select:focus {
   color: #dce7f2;
 }
 
+:root[data-theme="dark"] .master-reset-page {
+  background: linear-gradient(135deg, #0f1724, #15273b);
+}
+
+:root[data-theme="dark"] .master-reset-card {
+  background: #182231;
+  border-color: #304258;
+  box-shadow: 0 20px 44px rgba(0, 0, 0, 0.35);
+}
+
+:root[data-theme="dark"] .master-reset-eyebrow {
+  color: #f3c76e;
+}
+
+:root[data-theme="dark"] .master-reset-header h1,
+:root[data-theme="dark"] .master-reset-instructions h2,
+:root[data-theme="dark"] .master-reset-form label {
+  color: #e7edf5;
+}
+
+:root[data-theme="dark"] .master-reset-header p,
+:root[data-theme="dark"] .master-reset-instructions p,
+:root[data-theme="dark"] .master-logout {
+  color: #aebdce;
+}
+
+:root[data-theme="dark"] .master-reset-instructions {
+  background: rgba(31, 42, 59, 0.9);
+  border-color: #4a5f7c;
+}
+
+:root[data-theme="dark"] .master-reset-form input {
+  background: #111a27;
+  border-color: #3a4e66;
+  color: #e7edf5;
+}
+
+:root[data-theme="dark"] .master-reset-action {
+  background: #772728;
+  border-color: #8d3030;
+  color: #ffffff;
+}
+
 :root[data-theme="dark"] .header-back-btn:hover {
   background: #233247;
   border-color: #67d0e5;
@@ -3101,6 +3144,11 @@ select:focus {
 :root[data-theme="dark"] .sidebar-menu-item.active,
 :root[data-theme="dark"] .users-table thead {
   background: #233247;
+}
+
+:root[data-theme="dark"] .users-table tbody tr:hover {
+  background: #121d2c;
+  color: #e7edf5;
 }
 
 :root[data-theme="dark"] .sidebar-menu-item:hover,

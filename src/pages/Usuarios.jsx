@@ -93,18 +93,23 @@ function Usuarios() {
     setError('');
     const result = await getAllUsers();
     if (result.success) {
-      // Mapeia os dados para formato da tabela
-      const mappedUsers = result.users.map((user) => ({
-        id: user.id,
-        name: user.name || `${user.firstName || ''} ${user.lastName || ''}`.trim(),
-        email: user.email,
-        cpf: user.cpf || '-',
-        phone: user.phone || '-',
-        status: user.status || 'ativo',
-        firstName: user.firstName || '',
-        lastName: user.lastName || '',
-        ...user, // Mantém todos os dados originais
-      }));
+      const mappedUsers = result.users
+        .filter((user) => {
+          const role = String(user?.role || '').toLowerCase();
+          const status = String(user?.status || '').toLowerCase();
+          return role !== 'admin' && status !== 'master';
+        })
+        .map((user) => ({
+          id: user.id,
+          name: user.name || `${user.firstName || ''} ${user.lastName || ''}`.trim(),
+          email: user.email,
+          cpf: user.cpf || '-',
+          phone: user.phone || '-',
+          status: user.status || 'ativo',
+          firstName: user.firstName || '',
+          lastName: user.lastName || '',
+          ...user,
+        }));
       setUsers(mappedUsers);
     } else {
       setError(result.message);

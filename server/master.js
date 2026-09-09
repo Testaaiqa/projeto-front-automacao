@@ -6,10 +6,13 @@ export async function isMasterUser(userId) {
 
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { email: true, status: true },
+    select: { email: true, status: true, role: true },
   });
 
-  return user?.email.toLowerCase() === masterEmail && user.status === 'master';
+  return (
+    user?.email.toLowerCase() === masterEmail &&
+    (user.status === 'master' || user.role === 'admin')
+  );
 }
 
 export async function resetPlatformData(masterEmail) {

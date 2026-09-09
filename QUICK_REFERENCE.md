@@ -10,7 +10,7 @@ node server/api.js
 ```
 
 ## 🔑 Test Account
-- Email: `joao@teste.com`
+- Email: `qa@teste.com`
 - Password: `123456`
 
 ## 📂 Key Files
@@ -19,8 +19,8 @@ node server/api.js
 | `src/App.jsx` | Componente principal, roteamento |
 | `src/pages/Usuarios.jsx` | Tabela de usuários (carrega do API) |
 | `src/services/userService.js` | API client (login, users, delete) |
-| `server/api.js` | Backend Node.js (GET/POST/DELETE) |
-| `src/data/users.json` | Base de dados |
+| `server/api.js` | Backend Node.js com Prisma e Neon |
+| `prisma/schema.prisma` | Modelo do banco de dados |
 | `src/styles.css` | Estilos globais |
 
 ## 🎯 Current Page Routes
@@ -70,14 +70,14 @@ const [formMode, setFormMode] = useState('login');
 1. `Usuarios.jsx` monta
 2. `useEffect` chama `loadUsers()`
 3. `getAllUsers()` faz `GET /users`
-4. `api.js` lê `users.json`
+4. `api.js` consulta o banco Neon via Prisma
 5. Mapeia dados para formato de tabela
 6. `setUsers()` atualiza estado
 
 ## ✨ Implemented Features
 ✅ Login/Register com validação
 ✅ Sidebar menu responsivo
-✅ Tabela de usuários do users.json
+✅ Tabela de usuários do banco Neon
 ✅ Delete user (integrado)
 ✅ Progressive bar demo
 ✅ Loading states
@@ -94,13 +94,13 @@ const [formMode, setFormMode] = useState('login');
 
 ## 🐛 Common Issues
 - **"API already running"** → Close other terminal
-- **Can't load users** → Check if `node server/api.js` is running
-- **Login fails** → Check users.json for email/password
+- **Can't load users** → Check if `node server/api.js` is running and `DATABASE_URL` is valid
+- **Login fails** → Check the user in Neon or run the seed again
 - **Page goes to login on reload** → No state persistence (normal)
 
 ## 💡 Tips
-1. Users stored in `src/data/users.json`
-2. No database - all in memory + JSON file
-3. Each users.json edit needs API restart
+1. Users are stored in Neon via Prisma
+2. The app uses the real database, not JSON files
+3. If the database is unavailable, verify `DATABASE_URL` and Prisma migration status
 4. Test with browser devtools (F12)
 5. All components use React hooks

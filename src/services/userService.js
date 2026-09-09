@@ -115,9 +115,17 @@ export async function getAllUsers() {
     }
 
     const users = await response.json();
+    const visibleUsers = Array.isArray(users)
+      ? users.filter((user) => {
+          const role = String(user?.role || '').toLowerCase();
+          const status = String(user?.status || '').toLowerCase();
+          return role !== 'admin' && status !== 'master';
+        })
+      : [];
+
     return {
       success: true,
-      users: Array.isArray(users) ? users : [],
+      users: visibleUsers,
       message: 'Usuários carregados com sucesso',
     };
   } catch (error) {

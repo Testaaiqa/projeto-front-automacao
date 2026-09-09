@@ -1,9 +1,6 @@
 import { randomUUID } from 'node:crypto';
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
 
-const usersFilePath = resolve(process.cwd(), 'src/data/users.json');
-const seedUsers = JSON.parse(readFileSync(usersFilePath, 'utf-8'));
+const seedUsers = [];
 
 let users = seedUsers.map((user) => ({ ...user }));
 
@@ -63,6 +60,10 @@ export function validateRegisterPayload(userData) {
 
   if (userData.treatment === 'outro' && !String(userData.treatmentOtherText || '').trim()) {
     missingFields.push('Outro tratamento');
+  }
+
+  if (!userData.acceptTerms) {
+    missingFields.push('Aceite participar dos fluxos de teste da plataforma');
   }
 
   return missingFields;

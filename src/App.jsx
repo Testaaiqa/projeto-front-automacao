@@ -321,6 +321,10 @@ function App() {
       }
     });
 
+    if (!formData.acceptTerms) {
+      nextErrors.acceptTerms = 'Você precisa aceitar os termos para cadastrar.';
+    }
+
     if (formData.cpf && onlyDigits(formData.cpf).length !== 11) {
       nextErrors.cpf = 'CPF deve ter 11 dígitos.';
     }
@@ -880,7 +884,7 @@ function App() {
               Cadastro realizado com sucesso
             </h2>
             <p data-testid="success-modal-message">
-              Usuário {successModalUser.name} criado no arquivo users.json.
+              Usuário {successModalUser.name} criado com sucesso no banco Neon.
             </p>
             <button
               className="primary-action"

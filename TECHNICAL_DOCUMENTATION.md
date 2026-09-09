@@ -17,16 +17,21 @@
 projeto-front-automacao/
 ├── index.html                           # Entry HTML
 ├── package.json                        # Dependências
-├── vite.config.js                      # Config Vite
+├── prisma/
+│   ├── schema.prisma                   # Modelo do banco Neon
+│   ├── seed.js                        # Seed dos usuários iniciais
+│   ├── migrations/
+│   └── create-master.js               # Usuário mestre para reset
 ├── server/
 │   ├── api.js                         # API Node.js (porta 3001)
-│   └── database.js                    # Funções de leitura/escrita JSON
+│   ├── auth.js                       # Tokens JWT-like
+│   ├── banking.js                    # Rotas bancárias
+│   ├── master.js                     # Reset da plataforma
+│   └── prisma.js                     # Cliente Prisma
 ├── src/
 │   ├── App.jsx                        # Componente principal com roteamento
 │   ├── main.jsx                       # React DOM render
 │   ├── styles.css                     # Estilos globais (CSS puro)
-│   ├── data/
-│   │   └── users.json                 # Base de dados de usuários
 │   ├── services/
 │   │   └── userService.js             # API client functions
 │   ├── components/
@@ -52,7 +57,7 @@ loginUser() [userService.js]
     ↓
 POST /login (api.js)
     ↓
-readUsers() [database.js] → users.json
+Prisma busca usuário no banco Neon
     ↓
 Validação email/password
     ↓
@@ -69,7 +74,7 @@ getAllUsers() [userService.js]
     ↓
 GET /users (api.js)
     ↓
-readUsers() [database.js] → users.json
+Prisma consulta o banco Neon
     ↓
 Mapeia dados para formato da tabela
     ↓
@@ -86,7 +91,7 @@ deleteUser(userId) [userService.js]
     ↓
 DELETE /users/:id (api.js)
     ↓
-writeUsers() [database.js] → salva users.json
+Prisma remove o usuário no Neon
     ↓
 setUsers(filtered) → atualiza tabela
 ```
@@ -147,11 +152,11 @@ const [formMode, setFormMode] = useState('login'); // 'login' ou 'register'
 
 ### Usuarios.jsx
 **Features:**
-- Carrega dados reais do users.json via API
+- Carrega dados reais do banco Neon via API
 - Estado de loading enquanto busca dados
 - Exibição de erro se houver falha
 - Tabela com: Nome, E-mail, CPF, Telefone, Status, Ações
-- Botão "+ Novo Usuário" para adicionar (ainda sem integração)
+- Botão "+ Novo Usuário" para adicionar
 - Botões de editar e deletar
 - Paginação automática para muitos usuários (não implementada ainda)
 
@@ -189,7 +194,7 @@ const [formMode, setFormMode] = useState('login'); // 'login' ou 'register'
 ```
 POST /login
 Request:  { email, password }
-Response: { success, message, user }
+Response: { success, message, user, accessToken }
 ```
 
 ### Usuários
@@ -239,6 +244,9 @@ Response: { success, message, user }
 
 ## 🎨 Design e Estilos
 
+A aplicação usa o Neon como fonte de dados oficial; os usuários não são mais armazenados em arquivos JSON locais.
+
+
 ### Cores Principais
 ```css
 --primaria: #126d82    /* Azul petroleo */
@@ -268,44 +276,8 @@ Response: { success, message, user }
 
 ---
 
-## 👥 Usuários Padrão (users.json)
-
-```json
-[
-  {
-    "id": "1",
-    "name": "Usuario QA",
-    "email": "qa@teste.com",
-    "password": "123456"
-  },
-  {
-    "id": "99052fb5-3c8d-4934-a259-dcdb603d502e",
-    "name": "andre luis",
-    "firstName": "andre",
-    "lastName": "luis",
-    "email": "qa2@teste.com",
-    "password": "Z5xu_6tBdmN7_Cj",
-    "cpf": "090.909.090-90",
-    "birthDate": "1991-09-09",
-    "phone": "(00) 00000-9988",
-    "gender": "masculino",
-    "state": "PA",
-    ...
-  },
-  {
-    "id": "afb6b4b4-cf41-4a66-995d-42027913c956",
-    "name": "João Silva",
-    "firstName": "João",
-    "lastName": "Silva",
-    "email": "joao@teste.com",
-    "password": "123456",
-    "cpf": "123.456.789-01",
-    "phone": "(11) 98765-4321",
-    "state": "SP",
-    ...
-  }
-]
-```
+## 👥 Usuários Padrão
+Os usuários iniciais são criados no banco Neon via seed e não dependem mais de arquivos JSON locais.
 
 ---
 
@@ -331,7 +303,7 @@ node server/api.js
 ```
 
 ### 4. Login (teste)
-- Email: `joao@teste.com`
+- Email: `qa@teste.com`
 - Senha: `123456`
 
 ---
@@ -344,7 +316,7 @@ node server/api.js
 - [x] Header com hamburger
 - [x] Dashboard com módulos
 - [x] Página de usuários com tabela
-- [x] Carregamento de usuários do users.json
+- [x] Carregamento de usuários do banco Neon
 - [x] Deleção de usuários
 - [x] Barra de progresso interativa
 - [x] Design responsivo
@@ -385,11 +357,12 @@ node server/api.js
 **Verificar:**
 1. API está rodando? `node server/api.js`
 2. URL correta? `http://localhost:3001`
-3. users.json existe? `src/data/users.json`
+3. `DATABASE_URL` está configurada corretamente
+4. Prisma está sincronizado com o banco Neon
 
 ### Login não funciona
 **Verificar:**
-1. Email e senha corretos (ver users.json)
+1. Email e senha corretos no banco Neon
 2. Verificar console do navegador para erros
 3. API respondendo? Check em http://localhost:3001/users
 
@@ -397,7 +370,7 @@ node server/api.js
 
 ## 📝 Notas Importantes
 
-1. **users.json é a fonte de verdade** - Não há banco de dados
+1. **Neon é a fonte de verdade** - O banco real é o sistema principal
 2. **Reload da página volta ao login** - Estado não persiste
 3. **API responde em localhost:3001** - Hardcoded no userService.js
 4. **CSS é puro** - Sem bibliotecas UI (Tailwind, Material-UI, etc)

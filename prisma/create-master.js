@@ -17,6 +17,7 @@ try {
     update: {
       name: 'Administrador mestre',
       password,
+      role: 'admin',
       status: 'master',
     },
     create: {
@@ -24,6 +25,7 @@ try {
       name: 'Administrador mestre',
       email,
       password,
+      role: 'admin',
       status: 'master',
     },
   });

@@ -18,6 +18,7 @@ model User {
   birthDate            String?
   phone                String?
   gender               String?
+  role                 String           @default("common")
   status               String           @default("ativo")
   account              BankAccount?
   sentTransactions     Transaction[]    @relation("TransactionSender")

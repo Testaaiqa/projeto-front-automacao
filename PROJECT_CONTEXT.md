@@ -6,15 +6,22 @@ projeto-front-automacao/
 ├── index.html
 ├── package.json
 ├── README.md
+├── prisma/
+│   ├── schema.prisma
+│   ├── seed.js
+│   ├── migrations/
+│   └── create-master.js
 ├── server/
 │   ├── api.js (API na porta 3001)
-│   └── database.js
+│   ├── auth.js
+│   ├── banking.js
+│   ├── database.js
+│   ├── master.js
+│   └── prisma.js
 ├── src/
 │   ├── App.jsx (Componente principal com rotas)
 │   ├── main.jsx (Entry point)
 │   ├── styles.css (Estilos globais)
-│   ├── data/
-│   │   └── users.json (Base de usuários)
 │   ├── services/
 │   │   └── userService.js (Funções de autenticação/usuários)
 │   ├── components/
@@ -30,8 +37,8 @@ projeto-front-automacao/
 ## Stack Tecnológico
 - **Frontend:** React 19 + Vite 7
 - **Estilização:** CSS puro
-- **Backend:** Node.js (API local)
-- **Autenticação:** Email/Senha (usuários em users.json)
+- **Backend:** Node.js + Prisma + Neon
+- **Autenticação:** Email/Senha com dados no banco Neon
 
 ## Estados da Aplicação
 1. **Login/Registro** - Tela de autenticação
@@ -64,7 +71,7 @@ const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 - Estatísticas (6 módulos, ∞ cenários, 100% automatizável)
 
 ### Usuarios
-- Tabela com usuários do users.json
+- Tabela com usuários vindos do banco Neon
 - Botão para adicionar usuários
 - Ações: editar, deletar
 
@@ -73,31 +80,8 @@ const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 - Controles de velocidade
 - Exemplos de uso
 
-## Usuários no Sistema (users.json)
-```json
-[
-  {
-    "id": "1",
-    "name": "Usuario QA",
-    "email": "qa@teste.com",
-    "password": "123456"
-  },
-  {
-    "id": "99052fb5...",
-    "name": "andre luis",
-    "email": "qa2@teste.com",
-    "password": "Z5xu_6tBdmN7_Cj",
-    ...
-  },
-  {
-    "id": "afb6b4b4...",
-    "name": "João Silva",
-    "email": "joao@teste.com",
-    "password": "123456",
-    ...
-  }
-]
-```
+## Usuários no Sistema
+A base de usuários está no banco Neon, acessada via Prisma. Os dados não ficam mais em arquivos locais JSON.
 
 ## Endpoints da API (localhost:3001)
 - `POST /login` - Autenticar usuário
@@ -128,13 +112,12 @@ node server/api.js  # API Node (porta 3001)
 - [x] Autenticação com login/registro
 - [x] Menu sanduíche com navegação
 - [x] Dashboard com módulos
-- [x] Página de usuários (SERÁ ATUALIZADA para users.json)
+- [x] Página de usuários conectada ao banco Neon
 - [x] Barra de progresso interativa
 - [x] Design responsivo
 - [x] Lógica de logout
 
 ## Próximas Melhorias
-- [ ] Carregar usuários reais do users.json
 - [ ] CRUD completo de usuários
 - [ ] Formulários, Tabelas, Alertas
 - [ ] Testes com Cypress

@@ -1,10 +1,11 @@
 import { createServer } from 'node:http';
 import { randomUUID } from 'node:crypto';
-import { readUsers, writeUsers } from './database.js';
 import { applyRateLimitHeaders, consumeRateLimit } from '../api/_rateLimit.js';
-import { createAccessToken } from './auth.js';
+import { createAccessToken, getAuthenticatedUserId } from './auth.js';
 import { handleBankingRequest } from './banking.js';
 import { prisma } from './prisma.js';
+import { isMasterUser, resetPlatformData } from './master.js';
+import { isUserListVisible, sanitizeUser, serializeUsers } from './userSecurity.js';
 
 const PORT = 3001;
 const REQUIRED_REGISTER_FIELDS = [
@@ -66,11 +67,23 @@ function validateRegisterPayload(userData) {
     missingFields.push('Outro tratamento');
   }
 
+  if (!userData.acceptTerms) {
+    missingFields.push('Aceite participar dos fluxos de teste da plataforma');
+  }
+
   return missingFields;
 }
 
 function onlyDigits(value = '') {
   return String(value).replace(/\D/g, '');
+}
+
+function normalizeUser(user) {
+  return sanitizeUser(user);
+}
+
+function normalizeEmail(value = '') {
+  return String(value).trim().toLowerCase();
 }
 
 function validateCpf(cpf) {
@@ -162,15 +175,67 @@ const server = createServer(async (request, response) => {
   }
 
   if (request.method === 'GET' && request.url === '/users') {
-    const users = await readUsers();
-    sendJson(response, 200, users);
+    const users = await prisma.user.findMany({
+      orderBy: { createdAt: 'desc' },
+    });
+    const filteredUsers = serializeUsers(users);
+    sendJson(response, 200, filteredUsers);
+    return;
+  }
+
+  if (request.method === 'POST' && request.url === '/admin/reset') {
+    const userId = getAuthenticatedUserId(request);
+    if (!userId) {
+      sendJson(response, 401, {
+        success: false,
+        message: 'Token ausente, inválido ou expirado.',
+      });
+      return;
+    }
+
+    if (!(await isMasterUser(userId))) {
+      sendJson(response, 403, {
+        success: false,
+        message: 'Apenas o usuário mestre pode limpar a plataforma.',
+      });
+      return;
+    }
+
+    const body = await readRequestBody(request);
+    const REQUIRED_CONFIRMATION = 'RESETAR_TODA_A_PLATAFORMA';
+
+    if (body.confirmation !== REQUIRED_CONFIRMATION) {
+      sendJson(response, 400, {
+        success: false,
+        message: `Confirme a operação com ${REQUIRED_CONFIRMATION}.`,
+      });
+      return;
+    }
+
+    const masterEmail = process.env.MASTER_USER_EMAIL?.trim().toLowerCase();
+    if (!masterEmail) {
+      sendJson(response, 500, {
+        success: false,
+        message: 'Configuração do usuário mestre não encontrada.',
+      });
+      return;
+    }
+
+    const deleted = await resetPlatformData(masterEmail);
+    sendJson(response, 200, {
+      success: true,
+      message: 'Plataforma limpa com sucesso.',
+      deleted,
+    });
     return;
   }
 
   if (request.method === 'POST' && request.url === '/users') {
     const userData = await readRequestBody(request);
-    const { firstName, lastName, email, password } = userData;
-    const missingFields = validateRegisterPayload(userData);
+    const normalizedEmail = normalizeEmail(userData.email);
+    const sanitizedUserData = { ...userData, email: normalizedEmail };
+    const { firstName, lastName, email, password } = sanitizedUserData;
+    const missingFields = validateRegisterPayload(sanitizedUserData);
 
     if (missingFields.length > 0) {
       sendJson(response, 400, {
@@ -180,7 +245,7 @@ const server = createServer(async (request, response) => {
       return;
     }
 
-    const contactErrors = validateContactPayload(userData, true);
+    const contactErrors = validateContactPayload(sanitizedUserData, true);
 
     if (contactErrors.length > 0) {
       sendJson(response, 400, {
@@ -190,10 +255,9 @@ const server = createServer(async (request, response) => {
       return;
     }
 
-    const users = await readUsers();
-    const userAlreadyExists = users.some((user) => user.email === email);
+    const existingUser = await prisma.user.findUnique({ where: { email: normalizedEmail } });
 
-    if (userAlreadyExists) {
+    if (existingUser) {
       sendJson(response, 409, {
         success: false,
         message: 'Já existe um usuário cadastrado com este e-mail.',
@@ -201,28 +265,20 @@ const server = createServer(async (request, response) => {
       return;
     }
 
-    const newUser = {
-      id: randomUUID(),
-      name: `${firstName} ${lastName}`,
-      ...userData,
-      email,
-      password,
-    };
-
-    await writeUsers([...users, newUser]);
-    await prisma.user.create({
+    const newUser = await prisma.user.create({
       data: {
-        id: newUser.id,
-        name: newUser.name,
+        id: randomUUID(),
+        name: `${firstName} ${lastName}`.trim(),
         firstName,
         lastName,
-        email,
+        email: normalizedEmail,
         password,
-        cpf: newUser.cpf,
-        birthDate: newUser.birthDate,
-        phone: newUser.phone,
-        gender: newUser.gender,
-        status: newUser.status || 'ativo',
+        cpf: sanitizedUserData.cpf,
+        birthDate: sanitizedUserData.birthDate,
+        phone: sanitizedUserData.phone,
+        gender: sanitizedUserData.gender,
+        role: 'common',
+        status: sanitizedUserData.status || 'ativo',
         account: { create: {} },
       },
     });
@@ -230,15 +286,16 @@ const server = createServer(async (request, response) => {
     sendJson(response, 201, {
       success: true,
       message: 'Usuário cadastrado com sucesso. Agora faça login.',
-      user: newUser,
+      user: normalizeUser(newUser),
     });
     return;
   }
 
   if (request.method === 'POST' && request.url === '/login') {
     const { email, password } = await readRequestBody(request);
+    const normalizedEmail = normalizeEmail(email);
 
-    if (!email || !password) {
+    if (!normalizedEmail || !password) {
       sendJson(response, 400, {
         success: false,
         message: 'Informe e-mail e senha para fazer login.',
@@ -246,12 +303,9 @@ const server = createServer(async (request, response) => {
       return;
     }
 
-    const users = await readUsers();
-    const user = users.find(
-      (currentUser) => currentUser.email === email && currentUser.password === password,
-    );
+    const user = await prisma.user.findUnique({ where: { email: normalizedEmail } });
 
-    if (!user) {
+    if (!user || user.password !== password) {
       sendJson(response, 401, {
         success: false,
         message: 'Usuário ou senha inválidos.',
@@ -262,7 +316,7 @@ const server = createServer(async (request, response) => {
     sendJson(response, 200, {
       success: true,
       message: 'Login realizado com sucesso.',
-      user,
+      user: normalizeUser(user),
       accessToken: createAccessToken(user.id),
     });
     return;
@@ -271,10 +325,9 @@ const server = createServer(async (request, response) => {
   // DELETE /users/:id
   if (request.method === 'DELETE' && request.url.startsWith('/users/')) {
     const userId = request.url.split('/')[2];
-    const users = await readUsers();
-    const userIndex = users.findIndex((user) => user.id === userId);
+    const existingUser = await prisma.user.findUnique({ where: { id: userId } });
 
-    if (userIndex === -1) {
+    if (!existingUser) {
       sendJson(response, 404, {
         success: false,
         message: 'Usuário não encontrado.',
@@ -282,14 +335,20 @@ const server = createServer(async (request, response) => {
       return;
     }
 
-    const deletedUser = users[userIndex];
-    const updatedUsers = users.filter((user) => user.id !== userId);
-    await writeUsers(updatedUsers);
+    const deletedUser = await prisma.user.delete({ where: { id: userId } });
+
+    if (!isUserListVisible(deletedUser)) {
+      sendJson(response, 403, {
+        success: false,
+        message: 'Usuário protegido não pode ser removido por esta rota.',
+      });
+      return;
+    }
 
     sendJson(response, 200, {
       success: true,
       message: 'Usuário deletado com sucesso.',
-      user: deletedUser,
+      user: normalizeUser(deletedUser),
     });
     return;
   }
@@ -298,10 +357,13 @@ const server = createServer(async (request, response) => {
   if (request.method === 'PUT' && request.url.startsWith('/users/') && !request.url.includes('/status')) {
     const userId = request.url.split('/')[2];
     const updateData = await readRequestBody(request);
-    const users = await readUsers();
-    const userIndex = users.findIndex((user) => user.id === userId);
+    const normalizedUpdate = {
+      ...updateData,
+      email: updateData.email ? normalizeEmail(updateData.email) : updateData.email,
+    };
+    const existingUser = await prisma.user.findUnique({ where: { id: userId } });
 
-    if (userIndex === -1) {
+    if (!existingUser) {
       sendJson(response, 404, {
         success: false,
         message: 'Usuário não encontrado.',
@@ -309,7 +371,7 @@ const server = createServer(async (request, response) => {
       return;
     }
 
-    const contactErrors = validateContactPayload(updateData);
+    const contactErrors = validateContactPayload(normalizedUpdate);
 
     if (contactErrors.length > 0) {
       sendJson(response, 400, {
@@ -319,19 +381,30 @@ const server = createServer(async (request, response) => {
       return;
     }
 
-    const updatedUser = {
-      ...users[userIndex],
-      ...updateData,
-      id: users[userIndex].id, // Impede mudança de ID
-    };
+    if (!isUserListVisible(existingUser)) {
+      sendJson(response, 403, {
+        success: false,
+        message: 'Usuário protegido não pode ser alterado por esta rota.',
+      });
+      return;
+    }
 
-    users[userIndex] = updatedUser;
-    await writeUsers(users);
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: {
+        name: normalizedUpdate.name || existingUser.name,
+        email: normalizedUpdate.email || existingUser.email,
+        cpf: normalizedUpdate.cpf ?? existingUser.cpf,
+        phone: normalizedUpdate.phone ?? existingUser.phone,
+        firstName: normalizedUpdate.firstName ?? existingUser.firstName,
+        lastName: normalizedUpdate.lastName ?? existingUser.lastName,
+      },
+    });
 
     sendJson(response, 200, {
       success: true,
       message: 'Usuário atualizado com sucesso.',
-      user: updatedUser,
+      user: normalizeUser(updatedUser),
     });
     return;
   }
@@ -340,10 +413,9 @@ const server = createServer(async (request, response) => {
   if (request.method === 'PATCH' && request.url.startsWith('/users/') && request.url.includes('/status')) {
     const userId = request.url.split('/')[2];
     const { status } = await readRequestBody(request);
-    const users = await readUsers();
-    const userIndex = users.findIndex((user) => user.id === userId);
+    const existingUser = await prisma.user.findUnique({ where: { id: userId } });
 
-    if (userIndex === -1) {
+    if (!existingUser) {
       sendJson(response, 404, {
         success: false,
         message: 'Usuário não encontrado.',
@@ -359,13 +431,23 @@ const server = createServer(async (request, response) => {
       return;
     }
 
-    users[userIndex].status = status;
-    await writeUsers(users);
+    if (!isUserListVisible(existingUser)) {
+      sendJson(response, 403, {
+        success: false,
+        message: 'Usuário protegido não pode ter status alterado por esta rota.',
+      });
+      return;
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: { status },
+    });
 
     sendJson(response, 200, {
       success: true,
       message: `Usuário ${status} com sucesso.`,
-      user: users[userIndex],
+      user: normalizeUser(updatedUser),
     });
     return;
   }

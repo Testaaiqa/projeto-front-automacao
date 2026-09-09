@@ -1,12 +1,37 @@
-import { readFile } from 'node:fs/promises';
-import { resolve } from 'node:path';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
-const usersPath = resolve(process.cwd(), 'src/data/users.json');
-const users = JSON.parse(await readFile(usersPath, 'utf8'));
 
-for (const user of users) {
+const seedUsers = [
+  {
+    id: 'qa-default-user',
+    name: 'Usuário QA',
+    firstName: 'Usuário',
+    lastName: 'QA',
+    email: 'qa@teste.com',
+    password: '123456',
+    cpf: '12345678909',
+    birthDate: '1990-01-01',
+    phone: '(11) 99999-9999',
+    gender: 'masculino',
+    status: 'ativo',
+  },
+  {
+    id: 'qa-default-user-2',
+    name: 'André Luís',
+    firstName: 'André',
+    lastName: 'Luís',
+    email: 'qa2@teste.com',
+    password: 'Z5xu_6tBdmN7_Cj',
+    cpf: '09090909090',
+    birthDate: '1991-09-09',
+    phone: '(00) 00000-9988',
+    gender: 'masculino',
+    status: 'ativo',
+  },
+];
+
+for (const user of seedUsers) {
   await prisma.user.upsert({
     where: { id: user.id },
     update: {
@@ -37,5 +62,5 @@ await prisma.bankAccount.updateMany({
   data: { balance: 5000 },
 });
 
-console.log(`${users.length} usuários sincronizados no Neon.`);
+console.log(`${seedUsers.length} usuários sincronizados no Neon.`);
 await prisma.$disconnect();
