@@ -5,26 +5,9 @@ import { createAccessToken, getAuthenticatedUserId } from './auth.js';
 import { handleBankingRequest } from './banking.js';
 import { prisma } from './prisma.js';
 import { isMasterUser, resetPlatformData } from './master.js';
-import { isUserListVisible, sanitizeUser, serializeUsers } from './userSecurity.js';
+import { sanitizeUser, serializeUsers, validateRegisterPayload } from './userSecurity.js';
 
 const PORT = 3001;
-const REQUIRED_REGISTER_FIELDS = [
-  ['firstName', 'Nome'],
-  ['lastName', 'Sobrenome'],
-  ['email', 'E-mail'],
-  ['password', 'Senha'],
-  ['cpf', 'CPF'],
-  ['birthDate', 'Data de nascimento'],
-  ['phone', 'Telefone'],
-  ['gender', 'Sexo'],
-  ['zipCode', 'CEP'],
-  ['street', 'Rua'],
-  ['number', 'Número'],
-  ['complement', 'Complemento'],
-  ['neighborhood', 'Bairro'],
-  ['city', 'Cidade'],
-  ['state', 'Estado'],
-];
 
 function sendJson(response, statusCode, body) {
   response.writeHead(statusCode, {
@@ -54,28 +37,14 @@ function readRequestBody(request) {
   });
 }
 
-function validateRegisterPayload(userData) {
-  const missingFields = REQUIRED_REGISTER_FIELDS.filter(([fieldName]) => {
-    return !String(userData[fieldName] || '').trim();
-  }).map(([, label]) => label);
-
-  if (!userData.treatment) {
-    missingFields.push('Forma de tratamento');
-  }
-
-  if (userData.treatment === 'outro' && !String(userData.treatmentOtherText || '').trim()) {
-    missingFields.push('Outro tratamento');
-  }
-
-  if (!userData.acceptTerms) {
-    missingFields.push('Aceite participar dos fluxos de teste da plataforma');
-  }
-
-  return missingFields;
-}
-
 function onlyDigits(value = '') {
   return String(value).replace(/\D/g, '');
+}
+
+function getFirstNameLastName(name = '') {
+  const nameParts = String(name).trim().split(/\s+/).filter(Boolean);
+  const firstName = nameParts.shift() || '';
+  return { firstName, lastName: nameParts.join(' ') };
 }
 
 function normalizeUser(user) {
@@ -174,12 +143,45 @@ const server = createServer(async (request, response) => {
     return;
   }
 
-  if (request.method === 'GET' && request.url === '/users') {
+  if (request.method === 'GET' && request.url.startsWith('/users')) {
+    const requestUrl = new URL(request.url, 'http://localhost');
+    const search = requestUrl.searchParams.get('search')?.trim() || '';
+    const page = Number(requestUrl.searchParams.get('page') || '1');
+    const limit = Math.min(Number(requestUrl.searchParams.get('limit') || '30'), 30);
+    const validPage = Number.isFinite(page) && page > 0 ? page : 1;
+    const validLimit = Number.isFinite(limit) && limit > 0 ? limit : 30;
+
+    const where = search.length >= 3
+      ? {
+          OR: [
+            { name: { contains: search, mode: 'insensitive' } },
+            { email: { contains: search, mode: 'insensitive' } },
+            { cpf: { contains: search, mode: 'insensitive' } },
+            { phone: { contains: search, mode: 'insensitive' } },
+          ],
+        }
+      : {};
+
     const users = await prisma.user.findMany({
+      where,
       orderBy: { createdAt: 'desc' },
     });
+
     const filteredUsers = serializeUsers(users);
-    sendJson(response, 200, filteredUsers);
+    const totalCount = filteredUsers.length;
+    const totalPages = Math.max(1, Math.ceil(totalCount / validLimit));
+    const safePage = Math.min(validPage, totalPages);
+    const startIndex = (safePage - 1) * validLimit;
+    const pagedUsers = filteredUsers.slice(startIndex, startIndex + validLimit);
+
+    sendJson(response, 200, {
+      success: true,
+      users: pagedUsers,
+      totalCount,
+      totalPages,
+      page: safePage,
+      limit: validLimit,
+    });
     return;
   }
 
@@ -233,7 +235,13 @@ const server = createServer(async (request, response) => {
   if (request.method === 'POST' && request.url === '/users') {
     const userData = await readRequestBody(request);
     const normalizedEmail = normalizeEmail(userData.email);
-    const sanitizedUserData = { ...userData, email: normalizedEmail };
+    const derivedNameParts = getFirstNameLastName(userData.name || '');
+    const sanitizedUserData = {
+      ...userData,
+      email: normalizedEmail,
+      firstName: userData.firstName || derivedNameParts.firstName,
+      lastName: userData.lastName || derivedNameParts.lastName,
+    };
     const { firstName, lastName, email, password } = sanitizedUserData;
     const missingFields = validateRegisterPayload(sanitizedUserData);
 

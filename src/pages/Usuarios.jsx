@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { createUser, getAllUsers, deleteUser, updateUser, toggleUserStatus } from '../services/userService.js';
+import { getAllUsers, deleteUser, updateUser, toggleUserStatus } from '../services/userService.js';
 
 function onlyDigits(value) {
   return String(value || '').replace(/\D/g, '');
@@ -43,11 +43,13 @@ function validateUserForm(formData) {
     errors.email = 'E-mail é obrigatório.';
   }
 
-  if (formData.cpf && onlyDigits(formData.cpf).length !== 11) {
+  if (!formData.cpf || onlyDigits(formData.cpf).length !== 11) {
     errors.cpf = 'CPF deve ter 11 dígitos.';
   }
 
-  if (formData.phone) {
+  if (!formData.phone) {
+    errors.phone = 'Telefone é obrigatório.';
+  } else {
     const phoneLength = onlyDigits(formData.phone).length;
 
     if (phoneLength !== 10 && phoneLength !== 11) {
@@ -66,6 +68,9 @@ function FieldError({ message }) {
   return <span className="field-error">{message}</span>;
 }
 
+const PAGE_SIZE = 30;
+const SEARCH_DEBOUNCE_MS = 450;
+
 function Usuarios() {
   const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -74,46 +79,62 @@ function Usuarios() {
   const [editingUser, setEditingUser] = useState(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(null);
   const [fieldErrors, setFieldErrors] = useState({});
+  const [searchTerm, setSearchTerm] = useState('');
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalUsers, setTotalUsers] = useState(0);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     cpf: '',
     phone: '',
-    firstName: '',
-    lastName: '',
   });
 
-  // Carrega usuários ao montar o componente
   useEffect(() => {
-    loadUsers();
-  }, []);
+    const activeSearch = searchTerm.trim();
+    const nextSearch = activeSearch.length >= 3 ? activeSearch : '';
+    const timerId = setTimeout(() => {
+      if (page !== 1) {
+        setPage(1);
+        return;
+      }
 
-  async function loadUsers() {
+      loadUsers(nextSearch, 1);
+    }, SEARCH_DEBOUNCE_MS);
+
+    return () => clearTimeout(timerId);
+  }, [searchTerm]);
+
+  useEffect(() => {
+    const activeSearch = searchTerm.trim();
+    const nextSearch = activeSearch.length >= 3 ? activeSearch : '';
+    loadUsers(nextSearch, page);
+  }, [page]);
+
+  async function loadUsers(nextSearch = '', currentPage = 1) {
     setIsLoading(true);
     setError('');
-    const result = await getAllUsers();
+    const result = await getAllUsers(nextSearch, currentPage, PAGE_SIZE);
     if (result.success) {
-      const mappedUsers = result.users
-        .filter((user) => {
-          const role = String(user?.role || '').toLowerCase();
-          const status = String(user?.status || '').toLowerCase();
-          return role !== 'admin' && status !== 'master';
-        })
-        .map((user) => ({
-          id: user.id,
-          name: user.name || `${user.firstName || ''} ${user.lastName || ''}`.trim(),
-          email: user.email,
-          cpf: user.cpf || '-',
-          phone: user.phone || '-',
-          status: user.status || 'ativo',
-          firstName: user.firstName || '',
-          lastName: user.lastName || '',
-          ...user,
-        }));
+      const mappedUsers = result.users.map((user) => ({
+        id: user.id,
+        name: user.name || `${user.firstName || ''} ${user.lastName || ''}`.trim(),
+        email: user.email,
+        cpf: user.cpf || '-',
+        phone: user.phone || '-',
+        status: user.status || 'ativo',
+        firstName: user.firstName || '',
+        lastName: user.lastName || '',
+        ...user,
+      }));
       setUsers(mappedUsers);
+      setTotalUsers(Number(result.totalCount || mappedUsers.length || 0));
+      setTotalPages(Number(result.totalPages || 1));
     } else {
       setError(result.message);
       setUsers([]);
+      setTotalUsers(0);
+      setTotalPages(1);
     }
     setIsLoading(false);
   }
@@ -147,8 +168,6 @@ function Usuarios() {
       email: user.email,
       cpf: user.cpf === '-' ? '' : formatCpf(user.cpf),
       phone: user.phone === '-' ? '' : formatPhone(user.phone),
-      firstName: user.firstName || '',
-      lastName: user.lastName || '',
     });
     setFieldErrors({});
     setShowForm(true);
@@ -161,8 +180,6 @@ function Usuarios() {
       email: '',
       cpf: '',
       phone: '',
-      firstName: '',
-      lastName: '',
     });
     setFieldErrors({});
     setShowForm(false);
@@ -199,28 +216,30 @@ function Usuarios() {
     }
 
     if (editingUser) {
-      // Modo edição
+      const nameParts = String(formData.name || '').trim().split(/\s+/).filter(Boolean);
+      const firstName = nameParts.shift() || '';
+      const lastName = nameParts.join(' ');
+
       const updateData = {
-        name: formData.name || `${formData.firstName} ${formData.lastName}`.trim(),
+        name: formData.name,
         email: formData.email,
         cpf: formData.cpf || undefined,
         phone: formData.phone || undefined,
-        firstName: formData.firstName || undefined,
-        lastName: formData.lastName || undefined,
+        firstName,
+        lastName,
       };
 
       const result = await updateUser(editingUser.id, updateData);
       if (result.success) {
-        // Atualiza o usuário na lista
         setUsers(
           users.map((user) =>
             user.id === editingUser.id
               ? {
                   ...user,
                   ...result.user,
-                  name: result.user.name || `${result.user.firstName} ${result.user.lastName}`.trim(),
-                  cpf: result.user.cpf || '-',
-                  phone: result.user.phone || '-',
+                  name: result.user.name || formData.name,
+                  cpf: result.user.cpf || formData.cpf || '-',
+                  phone: result.user.phone || formData.phone || '-',
                 }
               : user,
           ),
@@ -228,33 +247,6 @@ function Usuarios() {
         handleCancelEdit();
       } else {
         setError(result.message);
-      }
-    } else {
-      const payload = {
-        firstName: formData.firstName || formData.name.split(' ')[0] || '',
-        lastName: formData.lastName || formData.name.split(' ').slice(1).join(' ') || '',
-        name: formData.name,
-        email: formData.email,
-        password: '123456',
-        cpf: formData.cpf || undefined,
-        phone: formData.phone || undefined,
-        status: 'ativo',
-      };
-
-      const result = await createUser(payload);
-      if (result.success) {
-        setFormData({
-          name: '',
-          email: '',
-          cpf: '',
-          phone: '',
-          firstName: '',
-          lastName: '',
-        });
-        setShowForm(false);
-        await loadUsers();
-      } else {
-        setError(result.message || 'Não foi possível cadastrar o usuário.');
       }
     }
   };
@@ -268,31 +260,44 @@ function Usuarios() {
     }
   };
 
+  const handleSearchChange = (event) => {
+    const value = event.target.value;
+    setSearchTerm(value);
+    if (page !== 1) {
+      setPage(1);
+    }
+  };
+
+  const canGoPrevious = page > 1;
+  const canGoNext = page < totalPages;
+
   return (
     <div className="usuarios-page" data-testid="usuarios-page">
       <div className="page-header">
         <h2 data-testid="usuarios-title">Gerenciamento de Usuários</h2>
-        {!showForm && (
-          <button
-            className="primary-action"
-            onClick={() => {
-              setEditingUser(null);
-              setFormData({
-                name: '',
-                email: '',
-                cpf: '',
-                phone: '',
-                firstName: '',
-                lastName: '',
-              });
-              setFieldErrors({});
-              setShowForm(true);
-            }}
-            data-testid="add-user-btn"
-          >
-            + Novo Usuário
-          </button>
-        )}
+      </div>
+
+      <div className="search-bar" style={{ marginBottom: '16px', display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
+        <input
+          type="search"
+          value={searchTerm}
+          onChange={handleSearchChange}
+          placeholder="Buscar por nome, e-mail, CPF ou telefone"
+          style={{
+            flex: '1 1 260px',
+            minWidth: '260px',
+            padding: '10px 12px',
+            borderRadius: '8px',
+            border: '1px solid #3a3f5a',
+            background: '#161b2d',
+            color: '#fff',
+          }}
+          aria-label="Buscar usuários"
+          data-testid="user-search-input"
+        />
+        <span style={{ color: '#b2bfd7', fontSize: '13px' }}>
+          {totalUsers} usuário{totalUsers === 1 ? '' : 's'}
+        </span>
       </div>
 
       {error && (
@@ -316,7 +321,7 @@ function Usuarios() {
       {showForm && (
         <div className="form-container" data-testid="user-form-container">
           <form onSubmit={handleSubmit} data-testid="user-form">
-            <h3>{editingUser ? 'Editar Usuário' : 'Novo Usuário'}</h3>
+            <h3>Editar Usuário</h3>
             <div className="form-grid">
               <label data-testid="user-name-label">
                 Nome
@@ -422,68 +427,96 @@ function Usuarios() {
           <p>Carregando usuários...</p>
         </div>
       ) : (
-        <div className="table-container" data-testid="usuarios-table-container">
-          <table className="users-table" data-testid="usuarios-table">
-            <thead>
-              <tr>
-                <th>Nome</th>
-                <th>E-mail</th>
-                <th>CPF</th>
-                <th>Telefone</th>
-                <th>Status</th>
-                <th>Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.length > 0 ? (
-                users.map((user) => (
-                  <tr key={user.id} data-testid={`user-row-${user.id}`}>
-                    <td>{user.name}</td>
-                    <td>{user.email}</td>
-                    <td>{user.cpf}</td>
-                    <td>{user.phone}</td>
-                    <td>
-                      <span
-                        className={`status-badge ${user.status}`}
-                        onClick={() => handleToggleStatus(user)}
-                        style={{ cursor: 'pointer' }}
-                        data-testid={`user-status-${user.id}`}
-                        title="Clique para alterar status"
-                      >
-                        {user.status === 'ativo' ? '✓ Ativo' : '✕ Inativo'}
-                      </span>
-                    </td>
-                    <td>
-                      <div className="action-buttons">
-                        <button
-                          className="action-btn edit"
-                          onClick={() => handleEdit(user)}
-                          data-testid={`edit-user-btn-${user.id}`}
-                          title="Editar usuário"
+        <div>
+          <div className="table-container" data-testid="usuarios-table-container">
+            <table className="users-table" data-testid="usuarios-table">
+              <thead>
+                <tr>
+                  <th>Nome</th>
+                  <th>E-mail</th>
+                  <th>CPF</th>
+                  <th>Telefone</th>
+                  <th>Status</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                {users.length > 0 ? (
+                  users.map((user) => (
+                    <tr key={user.id} data-testid={`user-row-${user.id}`}>
+                      <td>{user.name}</td>
+                      <td>{user.email}</td>
+                      <td>{user.cpf}</td>
+                      <td>{user.phone}</td>
+                      <td>
+                        <span
+                          className={`status-badge ${user.status}`}
+                          onClick={() => handleToggleStatus(user)}
+                          style={{ cursor: 'pointer' }}
+                          data-testid={`user-status-${user.id}`}
+                          title="Clique para alterar status"
                         >
-                          ✏️
-                        </button>
-                        <button
-                          className="action-btn delete"
-                          onClick={() => setShowDeleteConfirm(user.id)}
-                          data-testid={`delete-user-btn-${user.id}`}
-                          title="Deletar usuário"
-                        >
-                          🗑️
-                        </button>
-                      </div>
+                          {user.status === 'ativo' ? '✓ Ativo' : '✕ Inativo'}
+                        </span>
+                      </td>
+                      <td>
+                        <div className="action-buttons">
+                          <button
+                            className="action-btn edit"
+                            onClick={() => handleEdit(user)}
+                            data-testid={`edit-user-btn-${user.id}`}
+                            title="Editar usuário"
+                          >
+                            ✏️
+                          </button>
+                          <button
+                            className="action-btn delete"
+                            onClick={() => setShowDeleteConfirm(user.id)}
+                            data-testid={`delete-user-btn-${user.id}`}
+                            title="Deletar usuário"
+                          >
+                            🗑️
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="6" style={{ textAlign: 'center', padding: '20px' }}>
+                      Nenhum usuário encontrado
                     </td>
                   </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="6" style={{ textAlign: 'center', padding: '20px' }}>
-                    Nenhum usuário encontrado
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="pagination" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '16px', gap: '12px', flexWrap: 'wrap' }}>
+            <button
+              type="button"
+              className="secondary-action"
+              onClick={() => setPage((current) => Math.max(1, current - 1))}
+              disabled={!canGoPrevious}
+              data-testid="pagination-prev"
+            >
+              Anterior
+            </button>
+
+            <span style={{ color: '#c7d1eb', fontSize: '14px' }} data-testid="pagination-info">
+              Página {page} de {totalPages}
+            </span>
+
+            <button
+              type="button"
+              className="secondary-action"
+              onClick={() => setPage((current) => Math.min(totalPages, current + 1))}
+              disabled={!canGoNext}
+              data-testid="pagination-next"
+            >
+              Próxima
+            </button>
+          </div>
         </div>
       )}
     </div>

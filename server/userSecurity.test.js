@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { isUserListVisible, normalizeEmail, sanitizeUser, serializeUsers } from './userSecurity.js';
+import { isUserListVisible, normalizeEmail, sanitizeUser, serializeUsers, validateRegisterPayload } from './userSecurity.js';
 
 test('normalizes email to lowercase', () => {
   assert.equal(normalizeEmail('USER@TESTE.COM'), 'user@teste.com');
@@ -47,4 +47,16 @@ test('master users never appear in user lists', () => {
   assert.equal(visibleUsers[0].email, 'normal@email.com');
   assert.equal(visibleUsers[0].password, undefined);
   assert.equal(visibleUsers[0].cpf, '-');
+});
+
+test('minimal user creation payload is accepted on the admin user screen', () => {
+  const userData = {
+    name: 'Usuário Teste',
+    email: 'user@teste.com',
+    password: '123456',
+    cpf: '11111111111',
+    phone: '(11) 99999-1111',
+  };
+
+  assert.deepEqual(validateRegisterPayload(userData), []);
 });

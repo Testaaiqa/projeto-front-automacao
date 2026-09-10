@@ -97,9 +97,24 @@ export async function createUser(userData) {
   return readApiResponse(response);
 }
 
-export async function getAllUsers() {
+export async function getAllUsers(search = '', page = 1, limit = 30) {
   try {
-    const response = await fetch(`${API_URL}/users`, {
+    const params = new URLSearchParams();
+
+    if (search && search.trim().length >= 3) {
+      params.set('search', search.trim());
+    }
+
+    if (page && Number(page) > 0) {
+      params.set('page', String(page));
+    }
+
+    if (limit && Number(limit) > 0) {
+      params.set('limit', String(limit));
+    }
+
+    const queryString = params.toString() ? `?${params.toString()}` : '';
+    const response = await fetch(`${API_URL}/users${queryString}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -110,28 +125,38 @@ export async function getAllUsers() {
       return {
         success: false,
         users: [],
+        totalCount: 0,
+        totalPages: 1,
+        page: 1,
         message: 'Erro ao carregar usuários',
       };
     }
 
-    const users = await response.json();
-    const visibleUsers = Array.isArray(users)
-      ? users.filter((user) => {
-          const role = String(user?.role || '').toLowerCase();
-          const status = String(user?.status || '').toLowerCase();
-          return role !== 'admin' && status !== 'master';
-        })
-      : [];
+    const payload = await response.json();
+    const users = Array.isArray(payload) ? payload : (Array.isArray(payload.users) ? payload.users : []);
+    const totalCount = Number(payload.totalCount || users.length || 0);
+    const totalPages = Number(payload.totalPages || 1);
+    const currentPage = Number(payload.page || page || 1);
 
     return {
       success: true,
-      users: visibleUsers,
+      users: users.filter((user) => {
+        const role = String(user?.role || '').toLowerCase();
+        const status = String(user?.status || '').toLowerCase();
+        return role !== 'admin' && status !== 'master';
+      }),
+      totalCount,
+      totalPages,
+      page: currentPage,
       message: 'Usuários carregados com sucesso',
     };
   } catch (error) {
     return {
       success: false,
       users: [],
+      totalCount: 0,
+      totalPages: 1,
+      page: 1,
       message: 'Erro ao conectar com a API',
     };
   }
