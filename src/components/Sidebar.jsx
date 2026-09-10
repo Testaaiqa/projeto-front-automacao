@@ -1,4 +1,5 @@
 import React from 'react';
+import FlowIcon from './icons/FlowIcon.jsx';
 
 function Sidebar({ isOpen, onClose, onNavigate, currentPage, currentUser }) {
   const menuItems = [
@@ -92,7 +93,7 @@ function Sidebar({ isOpen, onClose, onNavigate, currentPage, currentUser }) {
                   onClick={() => handleMenuClick(item.id)}
                   data-testid={`sidebar-menu-${item.id}`}
                 >
-                  <span className="sidebar-menu-icon">{item.icon}</span>
+                  <span className="sidebar-menu-icon"><FlowIcon type={item.id} /></span>
                   <span className="sidebar-menu-label">{item.label}</span>
                 </button>
               </li>

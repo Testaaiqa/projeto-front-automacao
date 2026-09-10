@@ -1,4 +1,5 @@
 import React from 'react';
+import MenuIcon from './icons/MenuIcon.jsx';
 
 function Header({ onMenuToggle, onBack, showBack, currentUser }) {
   return (
@@ -10,9 +11,7 @@ function Header({ onMenuToggle, onBack, showBack, currentUser }) {
           data-testid="hamburger-btn"
           aria-label="Abrir menu"
         >
-          <span className="hamburger-icon"></span>
-          <span className="hamburger-icon"></span>
-          <span className="hamburger-icon"></span>
+          <MenuIcon />
         </button>
 
         {showBack && (

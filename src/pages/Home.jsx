@@ -1,4 +1,5 @@
 import React from 'react';
+import FlowIcon from '../components/icons/FlowIcon.jsx';
 
 function Home({ onNavigate = () => {} }) {
   const modules = [
@@ -74,7 +75,7 @@ function Home({ onNavigate = () => {} }) {
               data-testid={`module-card-${module.id}`}
               style={{ borderLeftColor: module.color }}
             >
-              <div className="module-icon">{module.icon}</div>
+              <div className="module-icon" style={{ color: module.color }}><FlowIcon size={32} type={module.id} /></div>
               <h3 className="module-title">{module.title}</h3>
               <p className="module-description">{module.description}</p>
               <button
