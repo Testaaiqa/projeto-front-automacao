@@ -1,7 +1,30 @@
-import { getUsers, sendJson, setUsers, validateContactPayload } from '../_usersStore.js';
 import { applyRateLimitHeaders, consumeRateLimit } from '../_rateLimit.js';
+import { prisma } from '../../server/prisma.js';
+import { isUserListVisible, normalizeEmail, sanitizeUser } from '../../server/userSecurity.js';
 
-export default function handler(request, response) {
+function sendJson(response, statusCode, body) {
+  response.status(statusCode).json(body);
+}
+
+function onlyDigits(value = '') {
+  return String(value).replace(/\D/g, '');
+}
+
+function validateContactPayload(userData) {
+  const errors = [];
+
+  if (userData.cpf && onlyDigits(userData.cpf).length !== 11) {
+    errors.push('CPF deve ter 11 dígitos.');
+  }
+
+  if (userData.phone && (onlyDigits(userData.phone).length !== 10 && onlyDigits(userData.phone).length !== 11)) {
+    errors.push('Telefone deve ter DDD e 8 ou 9 dígitos.');
+  }
+
+  return errors;
+}
+
+export default async function handler(request, response) {
   const rateLimit = consumeRateLimit(request, {
     keyPrefix: `user-detail:${request.method}`,
     capacity: 30,
@@ -19,10 +42,9 @@ export default function handler(request, response) {
   }
 
   const { id: userId } = request.query;
-  const users = getUsers();
-  const userIndex = users.findIndex((user) => user.id === userId);
+  const existingUser = await prisma.user.findUnique({ where: { id: userId } });
 
-  if (userIndex === -1) {
+  if (!existingUser) {
     sendJson(response, 404, {
       success: false,
       message: 'Usuário não encontrado.',
@@ -31,20 +53,32 @@ export default function handler(request, response) {
   }
 
   if (request.method === 'DELETE') {
-    const deletedUser = users[userIndex];
-    setUsers(users.filter((user) => user.id !== userId));
+    if (!isUserListVisible(existingUser)) {
+      sendJson(response, 403, {
+        success: false,
+        message: 'Usuário protegido não pode ser removido por esta rota.',
+      });
+      return;
+    }
+
+    const deletedUser = await prisma.user.delete({ where: { id: userId } });
 
     sendJson(response, 200, {
       success: true,
       message: 'Usuário deletado com sucesso.',
-      user: deletedUser,
+      user: sanitizeUser(deletedUser),
     });
     return;
   }
 
   if (request.method === 'PUT') {
     const updateData = request.body || {};
-    const contactErrors = validateContactPayload(updateData);
+    const normalizedUpdate = {
+      ...updateData,
+      email: updateData.email ? normalizeEmail(updateData.email) : updateData.email,
+    };
+
+    const contactErrors = validateContactPayload(normalizedUpdate);
 
     if (contactErrors.length > 0) {
       sendJson(response, 400, {
@@ -54,19 +88,30 @@ export default function handler(request, response) {
       return;
     }
 
-    const updatedUser = {
-      ...users[userIndex],
-      ...updateData,
-      id: users[userIndex].id,
-    };
+    if (!isUserListVisible(existingUser)) {
+      sendJson(response, 403, {
+        success: false,
+        message: 'Usuário protegido não pode ser alterado por esta rota.',
+      });
+      return;
+    }
 
-    users[userIndex] = updatedUser;
-    setUsers(users);
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: {
+        name: normalizedUpdate.name || existingUser.name,
+        email: normalizedUpdate.email || existingUser.email,
+        cpf: normalizedUpdate.cpf ?? existingUser.cpf,
+        phone: normalizedUpdate.phone ?? existingUser.phone,
+        firstName: normalizedUpdate.firstName ?? existingUser.firstName,
+        lastName: normalizedUpdate.lastName ?? existingUser.lastName,
+      },
+    });
 
     sendJson(response, 200, {
       success: true,
       message: 'Usuário atualizado com sucesso.',
-      user: updatedUser,
+      user: sanitizeUser(updatedUser),
     });
     return;
   }

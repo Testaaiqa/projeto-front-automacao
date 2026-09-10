@@ -1,7 +1,12 @@
-import { getUsers, sendJson, setUsers } from '../../_usersStore.js';
 import { applyRateLimitHeaders, consumeRateLimit } from '../../_rateLimit.js';
+import { prisma } from '../../../server/prisma.js';
+import { isUserListVisible, sanitizeUser } from '../../../server/userSecurity.js';
 
-export default function handler(request, response) {
+function sendJson(response, statusCode, body) {
+  response.status(statusCode).json(body);
+}
+
+export default async function handler(request, response) {
   const rateLimit = consumeRateLimit(request, {
     keyPrefix: 'user-status',
     capacity: 30,
@@ -29,10 +34,9 @@ export default function handler(request, response) {
 
   const { id: userId } = request.query;
   const { status } = request.body || {};
-  const users = getUsers();
-  const userIndex = users.findIndex((user) => user.id === userId);
+  const existingUser = await prisma.user.findUnique({ where: { id: userId } });
 
-  if (userIndex === -1) {
+  if (!existingUser) {
     sendJson(response, 404, {
       success: false,
       message: 'Usuário não encontrado.',
@@ -48,12 +52,22 @@ export default function handler(request, response) {
     return;
   }
 
-  users[userIndex].status = status;
-  setUsers(users);
+  if (!isUserListVisible(existingUser)) {
+    sendJson(response, 403, {
+      success: false,
+      message: 'Usuário protegido não pode ter status alterado por esta rota.',
+    });
+    return;
+  }
+
+  const updatedUser = await prisma.user.update({
+    where: { id: userId },
+    data: { status },
+  });
 
   sendJson(response, 200, {
     success: true,
     message: `Usuário ${status} com sucesso.`,
-    user: users[userIndex],
+    user: sanitizeUser(updatedUser),
   });
 }
