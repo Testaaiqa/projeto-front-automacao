@@ -208,6 +208,11 @@ function Usuarios() {
     e.preventDefault();
     setError('');
 
+    if (!editingUser) {
+      handleCancelEdit();
+      return;
+    }
+
     const validationErrors = validateUserForm(formData);
 
     if (Object.keys(validationErrors).length > 0) {
@@ -215,39 +220,37 @@ function Usuarios() {
       return;
     }
 
-    if (editingUser) {
-      const nameParts = String(formData.name || '').trim().split(/\s+/).filter(Boolean);
-      const firstName = nameParts.shift() || '';
-      const lastName = nameParts.join(' ');
+    const nameParts = String(formData.name || '').trim().split(/\s+/).filter(Boolean);
+    const firstName = nameParts.shift() || '';
+    const lastName = nameParts.join(' ');
 
-      const updateData = {
-        name: formData.name,
-        email: formData.email,
-        cpf: formData.cpf || undefined,
-        phone: formData.phone || undefined,
-        firstName,
-        lastName,
-      };
+    const updateData = {
+      name: formData.name,
+      email: formData.email,
+      cpf: formData.cpf || undefined,
+      phone: formData.phone || undefined,
+      firstName,
+      lastName,
+    };
 
-      const result = await updateUser(editingUser.id, updateData);
-      if (result.success) {
-        setUsers(
-          users.map((user) =>
-            user.id === editingUser.id
-              ? {
-                  ...user,
-                  ...result.user,
-                  name: result.user.name || formData.name,
-                  cpf: result.user.cpf || formData.cpf || '-',
-                  phone: result.user.phone || formData.phone || '-',
-                }
-              : user,
-          ),
-        );
-        handleCancelEdit();
-      } else {
-        setError(result.message);
-      }
+    const result = await updateUser(editingUser.id, updateData);
+    if (result.success) {
+      setUsers(
+        users.map((user) =>
+          user.id === editingUser.id
+            ? {
+                ...user,
+                ...result.user,
+                name: result.user.name || formData.name,
+                cpf: result.user.cpf || formData.cpf || '-',
+                phone: result.user.phone || formData.phone || '-',
+              }
+            : user,
+        ),
+      );
+      handleCancelEdit();
+    } else {
+      setError(result.message);
     }
   };
 
@@ -386,7 +389,7 @@ function Usuarios() {
 
             <div className="form-actions">
               <button type="submit" className="primary-action" data-testid="save-user-btn">
-                {editingUser ? 'Atualizar Usuário' : 'Salvar Usuário'}
+                Atualizar Usuário
               </button>
               <button
                 type="button"
