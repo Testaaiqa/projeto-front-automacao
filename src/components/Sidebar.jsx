@@ -43,6 +43,11 @@ function Sidebar({ isOpen, onClose, onNavigate, currentPage, currentUser }) {
       label: 'Modais',
       icon: '[]',
     },
+    {
+      id: 'ctfl',
+      label: 'Simulados CTFL',
+      icon: '✓',
+    },
   ];
 
   const handleMenuClick = (itemId) => {

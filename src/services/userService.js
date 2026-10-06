@@ -48,6 +48,21 @@ export async function requestCreditAnalysis(requestedLimit) {
   return readApiResponse(response);
 }
 
+export async function getCtflSyllabusStatus() {
+  try {
+    const response = await fetch(`${API_URL}/ctfl/syllabus`, {
+      headers: { Authorization: `Bearer ${getAccessToken()}` },
+    });
+    return readApiResponse(response);
+  } catch (error) {
+    return { success: false, message: 'Não foi possível consultar o monitor do syllabus.' };
+  }
+}
+
+export function getCtflSyllabusDocumentUrl(pdfSha256) {
+  return `${API_URL}/ctfl/syllabus/documents/${encodeURIComponent(pdfSha256)}`;
+}
+
 export async function resetPlatform(confirmation) {
   const response = await fetch(`${API_URL}/admin/reset`, {
     method: 'POST',

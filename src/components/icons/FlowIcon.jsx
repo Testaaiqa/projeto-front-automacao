@@ -12,6 +12,7 @@ function FlowIcon({ type, size = 24 }) {
     tabelas: <><rect {...stroke} height="16" rx="2" width="18" x="3" y="4" /><path {...stroke} d="M3 10h18M9 4v16M15 10v10" /></>,
     alerts: <><path {...stroke} d="M10.3 4.1 2.7 18a2 2 0 0 0 1.75 3h15.1a2 2 0 0 0 1.75-3L13.7 4.1a2 2 0 0 0-3.4 0Z" /><path {...stroke} d="M12 9v4M12 17h.01" /></>,
     modais: <><rect {...stroke} height="14" rx="2" width="18" x="3" y="5" /><path {...stroke} d="M3 9h18M7 7h.01M10 7h.01M15 13h3M15 16h2" /></>,
+    ctfl: <><path {...stroke} d="M12 3 14.5 4.5 17.5 4l1 3 2.5 2-1 3 1 3-2.5 2-1 3-3-.5L12 21l-2.5-1.5-3 .5-1-3L3 15l1-3-1-3 2.5-2 1-3 3 .5L12 3Z" /><path {...stroke} d="m9 12 2 2 4-4" /></>,
   };
 
   return <svg aria-hidden="true" className="flow-icon" height={size} viewBox="0 0 24 24" width={size} xmlns="http://www.w3.org/2000/svg">{icons[type]}</svg>;

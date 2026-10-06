@@ -11,6 +11,7 @@ import Forms from './pages/Forms';
 import Tables from './pages/Tables';
 import Alerts from './pages/Alerts';
 import Modals from './pages/Modals';
+import CTFL from './pages/CTFL';
 
 const APP_NAME = 'Testa aí QA - Plataforma de Teste';
 const BRAZIL_STATES = [
@@ -441,6 +442,8 @@ function App() {
         return <Alerts />;
       case 'modais':
         return <Modals />;
+      case 'ctfl':
+        return <CTFL />;
       default:
         return <Home onNavigate={handleNavigation} />;
     }

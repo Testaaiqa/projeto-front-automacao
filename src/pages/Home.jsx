@@ -52,6 +52,13 @@ function Home({ onNavigate = () => {} }) {
       icon: '🪟',
       color: '#8e7cc3',
     },
+    {
+      id: 'ctfl',
+      title: 'Simulados CTFL',
+      description: 'Prepare-se para a certificação ISTQB Foundation Level',
+      icon: '✓',
+      color: '#e5aa35',
+    },
   ];
 
   return (
@@ -94,7 +101,7 @@ function Home({ onNavigate = () => {} }) {
       <section className="home-stats">
         <div className="stats-container">
           <div className="stat-card">
-            <div className="stat-value">7</div>
+            <div className="stat-value">8</div>
             <div className="stat-label">Módulos</div>
           </div>
           <div className="stat-card">

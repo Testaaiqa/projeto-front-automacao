@@ -68,6 +68,39 @@ model CreditAnalysis {
   @@index([userId, createdAt])
 }
 
+model CtflSyllabusMonitor {
+  id                         String   @id
+  sourceUrl                  String
+  officialVersion            String?
+  pdfUrl                     String?
+  pdfSha256                  String?
+  sampleExamLetter           String?
+  sampleExamVersion          String?
+  sampleExamAnswersVersion   String?
+  sampleExamQuestionsPdfUrl  String?
+  sampleExamAnswersPdfUrl    String?
+  sampleQuestionsPdfSha256   String?
+  sampleAnswersPdfSha256     String?
+  lastCheckedAt              DateTime?
+  lastChangedAt              DateTime?
+  lastError                  String?
+  createdAt                  DateTime @default(now())
+  updatedAt                  DateTime @updatedAt
+}
+
+model CtflSyllabusDocument {
+  id              String   @id @default(uuid())
+  sourceUrl       String
+  officialVersion String
+  pdfUrl          String
+  pdfSha256       String   @unique
+  content         Bytes
+  createdAt       DateTime @default(now())
+  lastSeenAt      DateTime @default(now())
+
+  @@index([lastSeenAt])
+}
+
 enum TransactionType {
   DEPOSIT
   TRANSFER_SENT

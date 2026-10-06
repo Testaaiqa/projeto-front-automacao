@@ -1,0 +1,330 @@
+{
+  "bankVersion": "1.0.0",
+  "sourceSyllabusVersion": "4.0.1",
+  "sourceSampleExamVersion": "1.7",
+  "questionCount": 40,
+  "passingScore": 26,
+  "originalQuestions": true,
+  "questions": [
+    {
+      "id": "ctfl-001",
+      "topic": "Fundamentos de teste",
+      "question": "Uma equipe testa um sistema de pagamentos antes da entrada em produção. Qual resultado do teste é mais útil para a decisão de lançamento?",
+      "options": ["Uma prova de que nenhum defeito existe", "Informações sobre a qualidade e os riscos restantes", "Uma garantia de que todos os usuários agirão da mesma forma", "Uma substituição da revisão dos requisitos"],
+      "answer": 1,
+      "explanation": "O teste fornece evidências sobre qualidade e riscos; não prova a ausência de defeitos."
+    },
+    {
+      "id": "ctfl-002",
+      "topic": "Fundamentos de teste",
+      "question": "Durante uma alteração, uma pessoa interpreta incorretamente uma regra, introduz um defeito no código e a execução posterior produz um resultado incorreto. Qual sequência representa esses eventos?",
+      "options": ["Falha, erro humano, defeito", "Defeito, falha, erro humano", "Erro humano, defeito, falha", "Erro humano, falha, defeito"],
+      "answer": 2,
+      "explanation": "Uma ação humana pode introduzir um defeito; quando executado, esse defeito pode causar uma falha observável."
+    },
+    {
+      "id": "ctfl-003",
+      "topic": "Fundamentos de teste",
+      "question": "Um teste revela que o saldo exibido está incorreto. Qual atividade investiga a causa e altera o código para corrigir o problema?",
+      "options": ["Depuração", "Teste de confirmação", "Planejamento de teste", "Teste de aceitação"],
+      "answer": 0,
+      "explanation": "O teste pode revelar uma falha; a depuração procura sua causa e apoia a correção."
+    },
+    {
+      "id": "ctfl-004",
+      "topic": "Fundamentos de teste",
+      "question": "Qual é uma vantagem comum de envolver testadores independentes?",
+      "options": ["Eliminar a necessidade de colaboração com desenvolvedores", "Reduzir o viés ao avaliar o produto", "Garantir que todos os defeitos sejam encontrados", "Transferir toda a responsabilidade pela qualidade"],
+      "answer": 1,
+      "explanation": "Uma perspectiva independente pode reduzir viés, embora colaboração e responsabilidade compartilhada continuem necessárias."
+    },
+    {
+      "id": "ctfl-005",
+      "topic": "Fundamentos de teste",
+      "question": "Uma equipe executa testes de regressão após uma mudança pequena. Qual objetivo descreve melhor essa atividade?",
+      "options": ["Confirmar que a mudança corrigiu uma falha específica", "Verificar se áreas não alteradas foram afetadas pela mudança", "Medir somente o desempenho do sistema", "Aprovar os critérios de aceite com o cliente"],
+      "answer": 1,
+      "explanation": "Testes de regressão procuram efeitos adversos em áreas que não deveriam ter sido modificadas."
+    },
+    {
+      "id": "ctfl-006",
+      "topic": "Fundamentos de teste",
+      "question": "Há pouco tempo para testar uma funcionalidade de alto impacto financeiro. Qual abordagem ajuda a priorizar o esforço?",
+      "options": ["Executar primeiro os casos mais simples", "Priorizar testes conforme o risco", "Distribuir o mesmo tempo para cada requisito", "Adiar os testes até que não haja mudanças"],
+      "answer": 1,
+      "explanation": "Uma abordagem baseada em risco prioriza áreas considerando probabilidade e impacto de falhas."
+    },
+    {
+      "id": "ctfl-007",
+      "topic": "Princípios de teste",
+      "question": "Por que testar todas as combinações possíveis de entrada geralmente não é viável?",
+      "options": ["Porque os testes só podem ser executados manualmente", "Porque a quantidade de combinações pode crescer demais", "Porque sistemas não aceitam entradas variadas", "Porque testes exaustivos são proibidos"],
+      "answer": 1,
+      "explanation": "O espaço de combinações costuma ser grande; técnicas de teste selecionam casos representativos."
+    },
+    {
+      "id": "ctfl-008",
+      "topic": "Princípios de teste",
+      "question": "Uma área concentra muitos defeitos encontrados durante o teste. Qual princípio isso ilustra?",
+      "options": ["Os testes dependem do contexto", "Os defeitos tendem a se agrupar", "Testes se desgastam", "Ausência de defeitos garante sucesso"],
+      "answer": 1,
+      "explanation": "Uma quantidade relativamente pequena de componentes frequentemente concentra muitos defeitos."
+    },
+    {
+      "id": "ctfl-009",
+      "topic": "Princípios de teste",
+      "question": "Uma suíte antiga deixa de encontrar defeitos novos apesar de continuar passando. O que a equipe deve considerar?",
+      "options": ["Executar exatamente os mesmos casos para sempre", "Revisar e variar os testes existentes", "Remover todos os testes automatizados", "Tratar todos os resultados como inconclusivos"],
+      "answer": 1,
+      "explanation": "O paradoxo do pesticida indica que os testes devem ser revistos e ampliados ao longo do tempo."
+    },
+    {
+      "id": "ctfl-010",
+      "topic": "Princípios de teste",
+      "question": "Uma equipe adapta a estratégia de teste para um dispositivo médico e outra para um jogo casual. Qual princípio está sendo aplicado?",
+      "options": ["Os testes dependem do contexto", "O teste exaustivo é possível", "Todo defeito causa uma falha", "A independência elimina revisões"],
+      "answer": 0,
+      "explanation": "A abordagem apropriada depende do produto, dos riscos, das pessoas e do contexto."
+    },
+    {
+      "id": "ctfl-011",
+      "topic": "Princípios de teste",
+      "question": "Um sistema passa nos testes, mas os usuários não conseguem concluir a tarefa para a qual ele foi criado. Qual conclusão é mais adequada?",
+      "options": ["A ausência de defeitos observados garante sucesso", "O produto pode não atender às necessidades dos usuários", "Todos os testes devem ser repetidos sem mudanças", "A falha só pode estar nos dados de teste"],
+      "answer": 1,
+      "explanation": "Um produto tecnicamente correto ainda pode falhar em atender às necessidades e expectativas dos usuários."
+    },
+    {
+      "id": "ctfl-012",
+      "topic": "Ciclo de vida de desenvolvimento",
+      "question": "Uma equipe escolhe atividades de teste considerando entregas, riscos e práticas do ciclo de vida do projeto. Qual orientação está usando?",
+      "options": ["Adaptar o teste ao contexto do ciclo de vida", "Executar sempre os mesmos níveis na mesma ordem", "Testar apenas depois da codificação", "Substituir a análise por execução"],
+      "answer": 0,
+      "explanation": "As atividades e os níveis de teste devem ser ajustados ao ciclo de vida e ao contexto do projeto."
+    },
+    {
+      "id": "ctfl-013",
+      "topic": "Ciclo de vida de desenvolvimento",
+      "question": "Uma analista revisa critérios de aceitação antes do início da implementação. Qual benefício essa atividade antecipada oferece?",
+      "options": ["Elimina a necessidade de testar o software", "Pode revelar ambiguidades antes que se propaguem", "Garante que o código será escrito sem defeitos", "Substitui o teste de sistema"],
+      "answer": 1,
+      "explanation": "Encontrar problemas cedo em um produto de trabalho pode reduzir retrabalho em etapas posteriores."
+    },
+    {
+      "id": "ctfl-014",
+      "topic": "Ciclo de vida de desenvolvimento",
+      "question": "Depois da implantação, a equipe monitora erros reais e usa os resultados para orientar melhorias. Como essa prática é conhecida?",
+      "options": ["Teste baseado em componentes", "Teste no lado da produção (shift-right)", "Revisão estática", "Teste de confirmação"],
+      "answer": 1,
+      "explanation": "Atividades de teste também podem ocorrer após a implantação para observar o comportamento em uso."
+    },
+    {
+      "id": "ctfl-015",
+      "topic": "Níveis de teste",
+      "question": "Uma equipe testa uma função isolada usando dependências simuladas. Qual nível é o mais provável?",
+      "options": ["Teste de componente", "Teste de sistema", "Teste de aceitação", "Teste de manutenção"],
+      "answer": 0,
+      "explanation": "O teste de componente avalia unidades ou componentes isoladamente."
+    },
+    {
+      "id": "ctfl-016",
+      "topic": "Níveis de teste",
+      "question": "Dois serviços trocam mensagens em formatos diferentes. Qual nível de teste se concentra nessa interação?",
+      "options": ["Teste de componente", "Teste de integração", "Teste de aceitação", "Teste estático"],
+      "answer": 1,
+      "explanation": "O teste de integração verifica interações entre componentes ou sistemas."
+    },
+    {
+      "id": "ctfl-017",
+      "topic": "Níveis de teste",
+      "question": "Uma equipe verifica o comportamento completo do produto integrado contra requisitos funcionais e não funcionais. Qual nível é esse?",
+      "options": ["Teste de componente", "Teste de integração de componentes", "Teste de sistema", "Teste unitário"],
+      "answer": 2,
+      "explanation": "O teste de sistema avalia o sistema integrado como um todo em relação aos requisitos."
+    },
+    {
+      "id": "ctfl-018",
+      "topic": "Níveis de teste",
+      "question": "Representantes do negócio avaliam se uma versão atende às necessidades para liberação. Qual nível é mais associado a essa avaliação?",
+      "options": ["Teste de componente", "Teste de integração técnica", "Teste de aceitação", "Teste estrutural"],
+      "answer": 2,
+      "explanation": "O teste de aceitação ajuda a avaliar se o produto atende às necessidades e critérios de aceitação."
+    },
+    {
+      "id": "ctfl-019",
+      "topic": "Tipos de teste",
+      "question": "Uma verificação confirma que o sistema calcula corretamente o valor de uma taxa conforme a regra definida. Qual tipo de teste predomina?",
+      "options": ["Funcional", "Usabilidade", "Desempenho", "Portabilidade"],
+      "answer": 0,
+      "explanation": "O teste funcional avalia o que o sistema faz e se o comportamento corresponde às funções especificadas."
+    },
+    {
+      "id": "ctfl-020",
+      "topic": "Tipos de teste",
+      "question": "Uma equipe mede o tempo de resposta do sistema com muitos usuários simultâneos. Qual categoria de teste está sendo aplicada?",
+      "options": ["Funcional", "Não funcional", "Confirmação", "Estático"],
+      "answer": 1,
+      "explanation": "Desempenho é uma característica não funcional relacionada ao comportamento sob determinadas condições."
+    },
+    {
+      "id": "ctfl-021",
+      "topic": "Teste de confirmação e regressão",
+      "question": "Após uma correção, qual teste verifica se o defeito relatado foi corrigido?",
+      "options": ["Teste de regressão", "Teste de confirmação", "Teste de integração", "Teste exploratório"],
+      "answer": 1,
+      "explanation": "O teste de confirmação verifica se a correção resolveu a falha específica."
+    },
+    {
+      "id": "ctfl-022",
+      "topic": "Teste de confirmação e regressão",
+      "question": "Uma atualização de biblioteca pode afetar telas que não foram alteradas. Qual atividade procura esses efeitos colaterais?",
+      "options": ["Teste de confirmação", "Teste de regressão", "Revisão informal", "Teste de aceitação operacional"],
+      "answer": 1,
+      "explanation": "O teste de regressão procura efeitos adversos de mudanças em áreas não modificadas."
+    },
+    {
+      "id": "ctfl-023",
+      "topic": "Teste de manutenção",
+      "question": "Qual situação é um gatilho típico para teste de manutenção?",
+      "options": ["A criação inicial do plano de projeto", "Uma alteração em produção ou migração para novo ambiente", "A aprovação do orçamento anual", "A troca do facilitador de uma revisão"],
+      "answer": 1,
+      "explanation": "Mudanças, correções, atualizações ou migrações podem exigir teste de manutenção."
+    },
+    {
+      "id": "ctfl-024",
+      "topic": "Teste estático",
+      "question": "Uma equipe encontra uma inconsistência em um documento de requisitos sem executar o software. Que tipo de atividade está usando?",
+      "options": ["Teste dinâmico", "Teste estático", "Teste de carga", "Teste de recuperação"],
+      "answer": 1,
+      "explanation": "O teste estático examina produtos de trabalho sem executar o software."
+    },
+    {
+      "id": "ctfl-025",
+      "topic": "Revisões",
+      "question": "Qual é um benefício importante de revisar requisitos antes da implementação?",
+      "options": ["Encontrar problemas no produto de trabalho antes da execução", "Garantir que não haverá testes dinâmicos", "Substituir a comunicação com stakeholders", "Aumentar a quantidade de defeitos em produção"],
+      "answer": 0,
+      "explanation": "Revisões podem encontrar defeitos e ambiguidades em produtos de trabalho precocemente."
+    },
+    {
+      "id": "ctfl-026",
+      "topic": "Revisões",
+      "question": "Durante uma revisão, qual comportamento favorece uma discussão produtiva?",
+      "options": ["Concentrar comentários na pessoa autora", "Descrever o problema no produto de trabalho de forma objetiva", "Evitar registrar defeitos encontrados", "Pedir que somente gestores participem"],
+      "answer": 1,
+      "explanation": "Revisões devem focar o produto de trabalho e comunicar achados de modo construtivo."
+    },
+    {
+      "id": "ctfl-027",
+      "topic": "Revisões",
+      "question": "Quem normalmente facilita uma revisão formal e ajuda a manter o processo acordado?",
+      "options": ["Facilitador ou moderador", "Usuário final exclusivamente", "Autor do código em todos os casos", "Ferramenta de execução"],
+      "answer": 0,
+      "explanation": "O facilitador apoia o andamento da revisão e ajuda os participantes a seguirem o processo."
+    },
+    {
+      "id": "ctfl-028",
+      "topic": "Técnicas de teste",
+      "question": "Um campo aceita idades de 18 a 65 anos. Qual conjunto representa três partições de equivalência úteis?",
+      "options": ["17, 18 e 65", "Abaixo de 18, de 18 a 65, acima de 65", "18, 19 e 20", "Somente valores pares"],
+      "answer": 1,
+      "explanation": "Partições de equivalência agrupam valores que devem ser tratados de maneira semelhante."
+    },
+    {
+      "id": "ctfl-029",
+      "topic": "Técnicas de teste",
+      "question": "Para um limite inclusivo de 100 unidades, quais valores são mais úteis em uma análise de valor-limite de dois valores?",
+      "options": ["99 e 100", "50 e 75", "1 e 50", "100 e 200"],
+      "answer": 0,
+      "explanation": "A análise de dois valores considera valores imediatamente nos lados adjacentes ao limite."
+    },
+    {
+      "id": "ctfl-030",
+      "topic": "Técnicas de teste",
+      "question": "Uma regra de desconto depende de três condições booleanas. Qual técnica ajuda a verificar sistematicamente combinações de condições e ações?",
+      "options": ["Tabela de decisão", "Particionamento de equivalência", "Teste de recuperação", "Análise de causa raiz"],
+      "answer": 0,
+      "explanation": "Tabelas de decisão organizam combinações de condições e as ações resultantes."
+    },
+    {
+      "id": "ctfl-031",
+      "topic": "Técnicas de teste",
+      "question": "Um fluxo permite três tentativas de autenticação e depois bloqueia a conta. Qual técnica representa bem estados e transições?",
+      "options": ["Transição de estados", "Valor-limite de dois valores", "Teste de instrução", "Revisão baseada em checklist"],
+      "answer": 0,
+      "explanation": "A técnica de transição de estados modela estados, eventos e transições do sistema."
+    },
+    {
+      "id": "ctfl-032",
+      "topic": "Técnicas de teste",
+      "question": "Uma suíte executa cada instrução do código ao menos uma vez, mas não percorre todos os resultados de decisões. Qual afirmação é correta?",
+      "options": ["Cobertura de instrução implica cobertura de decisão", "Pode haver cobertura de instrução sem cobertura de decisão", "Cobertura de decisão é independente da execução", "As duas medidas são sempre idênticas"],
+      "answer": 1,
+      "explanation": "Cobertura de instrução não garante que todos os resultados de cada decisão tenham sido exercitados."
+    },
+    {
+      "id": "ctfl-033",
+      "topic": "Técnicas de teste",
+      "question": "Uma testadora explora uma funcionalidade, aprende com cada resultado e decide os próximos testes durante a sessão. Qual abordagem descreve isso?",
+      "options": ["Teste exploratório", "Teste de regressão automatizado", "Revisão técnica formal", "Teste de instalação exclusivamente"],
+      "answer": 0,
+      "explanation": "No teste exploratório, aprendizado, desenho e execução dos testes ocorrem de forma integrada."
+    },
+    {
+      "id": "ctfl-034",
+      "topic": "Técnicas de teste",
+      "question": "Uma equipe experiente cria casos a partir de defeitos comuns observados em projetos anteriores. Qual técnica baseada na experiência está usando?",
+      "options": ["Adivinhação de erros", "Tabela de decisão", "Cobertura de instrução", "Teste de transição de estados"],
+      "answer": 0,
+      "explanation": "A adivinhação de erros usa conhecimento sobre erros, defeitos e falhas típicos."
+    },
+    {
+      "id": "ctfl-035",
+      "topic": "Abordagens colaborativas",
+      "question": "Desenvolvedores e representantes do negócio escrevem exemplos executáveis antes da implementação para esclarecer o comportamento esperado. Qual abordagem se aplica?",
+      "options": ["Desenvolvimento guiado por testes de aceitação (ATDD)", "Teste de recuperação", "Análise estática de código", "Teste de manutenção"],
+      "answer": 0,
+      "explanation": "ATDD usa exemplos e critérios de aceitação colaborativos para orientar o desenvolvimento."
+    },
+    {
+      "id": "ctfl-036",
+      "topic": "Gerenciamento de teste",
+      "question": "Qual elemento deve ser definido ao planejar uma atividade de teste?",
+      "options": ["Objetivos, abordagem, recursos e critérios de conclusão", "Somente a cor dos relatórios", "A quantidade de defeitos que será encontrada", "A eliminação de toda incerteza"],
+      "answer": 0,
+      "explanation": "O planejamento define objetivos, abordagem, recursos, cronograma e critérios relevantes."
+    },
+    {
+      "id": "ctfl-037",
+      "topic": "Gerenciamento de teste",
+      "question": "Uma funcionalidade tem alta probabilidade de falha e grande impacto para clientes. Como o risco deve influenciar o teste?",
+      "options": ["Reduzir sua prioridade porque já é conhecida", "Aumentar a prioridade e o esforço de teste", "Ignorar o impacto e testar apenas o caminho feliz", "Adiar toda análise até a produção"],
+      "answer": 1,
+      "explanation": "Riscos mais altos justificam maior prioridade e esforço de teste."
+    },
+    {
+      "id": "ctfl-038",
+      "topic": "Gerenciamento de teste",
+      "question": "Os testes restantes não podem ser executados antes da data de entrega. Qual informação ajuda a decidir se o teste pode ser concluído?",
+      "options": ["Critérios de saída e riscos residuais", "Somente o número de reuniões", "A preferência pessoal do testador", "A quantidade de linhas alteradas sem contexto"],
+      "answer": 0,
+      "explanation": "Critérios de saída e riscos residuais fornecem evidências para decisões de conclusão e liberação."
+    },
+    {
+      "id": "ctfl-039",
+      "topic": "Gerenciamento de teste",
+      "question": "Qual informação torna um relatório de defeito mais útil para investigação?",
+      "options": ["Passos para reproduzir, resultado esperado e observado, ambiente", "Somente o nome de quem reportou", "Uma conclusão sem evidências", "Uma captura sem descrição ou contexto"],
+      "answer": 0,
+      "explanation": "Informações reproduzíveis e contexto ajudam a investigar, priorizar e corrigir defeitos."
+    },
+    {
+      "id": "ctfl-040",
+      "topic": "Ferramentas de teste",
+      "question": "Uma equipe automatiza casos instáveis sem revisar sua manutenção. Qual risco pode aumentar?",
+      "options": ["Custos de manutenção e resultados falsos", "A necessidade de requisitos claros", "A cobertura de teste manual", "A comunicação entre stakeholders"],
+      "answer": 0,
+      "explanation": "Automação pode trazer benefícios, mas também custos de manutenção e riscos de falsos resultados."
+    }
+  ]
+}

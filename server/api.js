@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { applyRateLimitHeaders, consumeRateLimit } from '../api/_rateLimit.js';
 import { createAccessToken, getAuthenticatedUserId } from './auth.js';
 import { handleBankingRequest } from './banking.js';
+import { handleCtflSyllabusRequest } from './ctflSyllabus.js';
 import { prisma } from './prisma.js';
 import { isMasterUser, resetPlatformData } from './master.js';
 import { sanitizeUser, serializeUsers, validateRegisterPayload } from './userSecurity.js';
@@ -132,6 +133,21 @@ const server = createServer(async (request, response) => {
     });
     return;
   }
+
+  const ctflSyllabusHandled = await handleCtflSyllabusRequest(
+    request,
+    (statusCode, body) => sendJson(response, statusCode, body),
+    (statusCode, pdf) => {
+      response.writeHead(statusCode, {
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': `attachment; filename="${pdf.fileName}"`,
+        'Content-Length': pdf.content.length,
+        'X-Content-Type-Options': 'nosniff',
+      });
+      response.end(pdf.content);
+    },
+  );
+  if (ctflSyllabusHandled) return;
 
   const bankingHandled = await handleBankingRequest(
     request,
