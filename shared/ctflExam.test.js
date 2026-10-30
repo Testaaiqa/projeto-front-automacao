@@ -44,6 +44,8 @@ test('randomization preserves the correct option for every question', () => {
   const originals = new Map(questionBank.questions.map((question) => [question.id, question]));
 
   assert.equal(randomized.length, 40);
+  const counts = randomized.reduce((result, question) => ({ ...result, [question.chapter]: (result[question.chapter] || 0) + 1 }), {});
+  assert.deepEqual(counts, { 1: 8, 2: 6, 3: 4, 4: 11, 5: 9, 6: 2 });
   randomized.forEach((question) => {
     const original = originals.get(question.id);
     assert.equal(question.options[question.answer], original.options[original.answer]);

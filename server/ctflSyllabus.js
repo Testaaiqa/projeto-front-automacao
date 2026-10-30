@@ -1,12 +1,25 @@
 import { createHash, timingSafeEqual } from 'node:crypto';
+import questionBank from '../src/data/ctfl-question-bank.json' with { type: 'json' };
 
-export const CTFL_SYLLABUS_SOURCE_URL = 'https://www.istqb.org/certifications/certified-tester-foundation-level';
-export const CTFL_QUESTION_BANK_VERSION = process.env.CTFL_QUESTION_BANK_VERSION?.trim() || '4.0.1';
+export const CTFL_SYLLABUS_SOURCE_URL = questionBank.sourceSyllabusUrl;
+export const CTFL_QUESTION_BANK_VERSION = process.env.CTFL_QUESTION_BANK_VERSION?.trim() || questionBank.sourceSyllabusVersion;
 const configuredQuestionBankPdfSha256 = process.env.CTFL_QUESTION_BANK_PDF_SHA256?.trim().toLowerCase() || '';
 export const CTFL_QUESTION_BANK_PDF_SHA256 = /^[a-f\d]{64}$/.test(configuredQuestionBankPdfSha256)
   ? configuredQuestionBankPdfSha256
   : null;
-export const CTFL_QUESTION_BANK_SAMPLE_VERSION = process.env.CTFL_QUESTION_BANK_SAMPLE_VERSION?.trim() || '1.7';
+export const CTFL_QUESTION_BANK_SAMPLE_VERSION = process.env.CTFL_QUESTION_BANK_SAMPLE_VERSION?.trim() || questionBank.sourceSampleExamSets[0]?.version || '1.7';
+export const CTFL_QUESTION_BANK_SAMPLE_SET_VERSIONS = Object.fromEntries(questionBank.sourceSampleExamSets.map(({ examLetter, version }) => [examLetter, version]));
+function parseEnvironmentJson(value) {
+  try { return JSON.parse(value || '{}'); } catch { return {}; }
+}
+const configuredSampleSetVersions = parseEnvironmentJson(process.env.CTFL_QUESTION_BANK_SAMPLE_SET_VERSIONS);
+const configuredSampleSetHashes = parseEnvironmentJson(process.env.CTFL_QUESTION_BANK_SAMPLE_SHA256S);
+const sampleSetHashes = Object.fromEntries(Object.entries(configuredSampleSetHashes).map(([key, value]) => [
+  key.toUpperCase(), {
+    questions: /^[a-f\d]{64}$/i.test(value?.questions || '') ? value.questions.toLowerCase() : null,
+    answers: /^[a-f\d]{64}$/i.test(value?.answers || '') ? value.answers.toLowerCase() : null,
+  },
+]));
 const configuredQuestionBankSampleSha256 = process.env.CTFL_QUESTION_BANK_SAMPLE_SHA256?.trim().toLowerCase() || '';
 export const CTFL_QUESTION_BANK_SAMPLE_SHA256 = /^[a-f\d]{64}$/.test(configuredQuestionBankSampleSha256)
   ? configuredQuestionBankSampleSha256
@@ -16,7 +29,7 @@ const MONITOR_ID = 'ctfl';
 const MAX_PDF_BYTES = 20 * 1024 * 1024;
 const MAX_RETAINED_PDFS = 2;
 const PDF_RETENTION_LOCK_ID = 71870401;
-const ALLOWED_SOURCE_HOSTS = new Set(['istqb.org', 'www.istqb.org']);
+const ALLOWED_SOURCE_HOSTS = new Set(['bstqb.qa', 'www.bstqb.qa']);
 function createRequestOptions() {
   return {
     headers: { 'User-Agent': 'TestaAiCTFLSyllabusMonitor/1.0' },
@@ -34,7 +47,7 @@ function decodeHtml(value) {
 function getAllowedPdfUrl(href, baseUrl) {
   const pdfUrl = new URL(decodeHtml(href), baseUrl);
   if (pdfUrl.protocol !== 'https:' || !ALLOWED_SOURCE_HOSTS.has(pdfUrl.hostname)) {
-    throw new Error('O link do syllabus não pertence ao domínio oficial do ISTQB.');
+    throw new Error('O link do material não pertence ao domínio oficial do BSTQB.');
   }
   return pdfUrl.toString();
 }
@@ -54,73 +67,55 @@ function compareVersions(leftVersion, rightVersion) {
 
 export function extractOfficialSyllabus(html, sourceUrl = CTFL_SYLLABUS_SOURCE_URL) {
   const anchors = html.match(/<a\b[^>]*>[\s\S]*?<\/a>/gi) || [];
-
   for (const anchor of anchors) {
-    const text = anchor
-      .replace(/<[^>]+>/g, ' ')
-      .replace(/\s+/g, ' ')
-      .trim();
-    const syllabusMatch = text.match(/ISTQB\s+CTFL\s+Syllabus\s+v?(\d+(?:\.\d+)+)/i);
+    const text = anchor.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+    const syllabusMatch = text.match(/(?:ISTQB\s+)?CTFL\s+Syllabus\s+v?(\d+(?:\.\d+)+)/i);
     if (!syllabusMatch) continue;
-
     const hrefMatch = anchor.match(/\bhref=["']([^"']+)["']/i);
     if (!hrefMatch) continue;
-
-    return {
-      version: syllabusMatch[1],
-      pdfUrl: getAllowedPdfUrl(hrefMatch[1], sourceUrl),
-    };
+    return { version: syllabusMatch[1], pdfUrl: getAllowedPdfUrl(hrefMatch[1], sourceUrl) };
   }
-
-  throw new Error('Não foi possível localizar o PDF do syllabus CTFL na página oficial.');
+  throw new Error('Não foi possível localizar o PDF do syllabus CTFL na página oficial do BSTQB.');
 }
 
-export function extractOfficialSampleExam(html, sourceUrl = CTFL_SYLLABUS_SOURCE_URL) {
+export function extractOfficialSampleExams(html, sourceUrl = CTFL_SYLLABUS_SOURCE_URL) {
   const anchors = html.match(/<a\b[^>]*>[\s\S]*?<\/a>/gi) || [];
   const samples = new Map();
-
   for (const anchor of anchors) {
-    const text = anchor
-      .replace(/<[^>]+>/g, ' ')
-      .replace(/\s+/g, ' ')
-      .trim();
-    const match = text.match(/ISTQB\s+CTFL\s+v?(\d+(?:\.\d+)+)\s+Sample Exam\s+([A-Z])\s*-\s*(Questions|Answers)\s+v?(\d+(?:\.\d+)+)/i);
-    if (!match) continue;
-
     const hrefMatch = anchor.match(/\bhref=["']([^"']+)["']/i);
     if (!hrefMatch) continue;
-
-    const [, syllabusVersion, examLetter, documentType, sampleVersion] = match;
-    const key = `${examLetter.toUpperCase()}-${sampleVersion}`;
+    const text = anchor.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+    const sampleReference = text + ' ' + hrefMatch[1];
+    const match = sampleReference.match(/(?:Sample[-_\s]?Exam[-_\s]?([A-Z])|Set[-_\s]?([A-Z])).*?v(\d+(?:\.\d+)+)/i);
+    const typeMatch = sampleReference.match(/(Questions|Perguntas|Answers|Respostas)/i);
+    if (!match || !typeMatch) continue;
+    const examLetter = (match[1] || match[2]).toUpperCase();
+    const version = match[3];
+    const documentType = /^(Questions|Perguntas)$/i.test(typeMatch[1]) ? 'questions' : 'answers';
+    const key = examLetter + '-' + version;
     const sample = samples.get(key) || {
-      syllabusVersion,
-      examLetter: examLetter.toUpperCase(),
-      version: sampleVersion,
+      syllabusVersion: questionBank.sourceSyllabusVersion,
+      examLetter,
+      version,
       questionsPdfUrl: null,
       answersPdfUrl: null,
     };
     const pdfUrl = getAllowedPdfUrl(hrefMatch[1], sourceUrl);
-
-    if (documentType.toLowerCase() === 'questions') {
-      sample.questionsPdfUrl = pdfUrl;
-    } else {
-      sample.answersPdfUrl = pdfUrl;
-    }
+    if (documentType === 'questions') sample.questionsPdfUrl = pdfUrl;
+    else sample.answersPdfUrl = pdfUrl;
     samples.set(key, sample);
   }
-
   const completeSamples = [...samples.values()]
     .filter((sample) => sample.questionsPdfUrl && sample.answersPdfUrl)
-    .sort((left, right) => (
-      compareVersions(right.version, left.version)
-      || left.examLetter.localeCompare(right.examLetter)
-    ));
-
+    .sort((left, right) => compareVersions(right.version, left.version) || left.examLetter.localeCompare(right.examLetter));
   if (completeSamples.length === 0) {
-    throw new Error('Não foi possível localizar um par oficial de PDFs de questões e respostas CTFL.');
+    throw new Error('Não foi possível localizar os PDFs oficiais de perguntas e respostas CTFL do BSTQB.');
   }
+  return completeSamples;
+}
 
-  return completeSamples[0];
+export function extractOfficialSampleExam(html, sourceUrl = CTFL_SYLLABUS_SOURCE_URL) {
+  return extractOfficialSampleExams(html, sourceUrl)[0];
 }
 
 async function downloadOfficialPdf(fetchImpl, pdfUrl, label) {
@@ -165,11 +160,14 @@ export function buildCtflSyllabusStatus(record, {
     && record?.pdfSha256?.toLowerCase() === questionBankPdfSha256,
   );
   const sampleExamVersion = record?.sampleExamVersion || null;
-  const sampleExamVersionMatches = sampleExamVersion === questionBankSampleVersion;
-  const sampleExamPdfHashMatches = Boolean(
-    questionBankSampleSha256
-    && record?.sampleQuestionsPdfSha256?.toLowerCase() === questionBankSampleSha256,
-  );
+  const sampleExamSets = record?.sampleExamSets || [];
+  const sampleExamVersionMatches = sampleExamSets.length
+    ? sampleExamSets.every((sample) => sample.version === (configuredSampleSetVersions[sample.examLetter] || CTFL_QUESTION_BANK_SAMPLE_SET_VERSIONS[sample.examLetter]))
+    : sampleExamVersion === questionBankSampleVersion;
+  const sampleExamPdfHashMatches = sampleExamSets.length
+    ? sampleExamSets.every((sample) => sampleSetHashes[sample.examLetter]?.questions === sample.questionsPdfSha256
+      && sampleSetHashes[sample.examLetter]?.answers === sample.answersPdfSha256)
+    : Boolean(questionBankSampleSha256 && record?.sampleQuestionsPdfSha256?.toLowerCase() === questionBankSampleSha256);
   let status = 'pending';
 
   if (record?.lastError) {
@@ -188,6 +186,7 @@ export function buildCtflSyllabusStatus(record, {
     versionMatches,
     pdfHashMatches,
     sampleExamLetter: record?.sampleExamLetter || null,
+    sampleExamSets,
     sampleExamVersion,
     sampleExamAnswersVersion: record?.sampleExamAnswersVersion || null,
     sampleExamQuestionsPdfUrl: record?.sampleExamQuestionsPdfUrl || null,
@@ -297,12 +296,22 @@ export async function checkOfficialCtflSyllabus({ fetchImpl = fetch, prismaClien
 
     const pageHtml = await pageResponse.text();
     const syllabus = extractOfficialSyllabus(pageHtml);
-    const sampleExam = extractOfficialSampleExam(pageHtml);
-    const [syllabusPdf, questionsPdf, answersPdf] = await Promise.all([
+    const sampleExams = extractOfficialSampleExams(pageHtml);
+    const [syllabusPdf, ...samplePdfResults] = await Promise.all([
       downloadOfficialPdf(fetchImpl, syllabus.pdfUrl, 'syllabus'),
-      downloadOfficialPdf(fetchImpl, sampleExam.questionsPdfUrl, 'questões de exemplo'),
-      downloadOfficialPdf(fetchImpl, sampleExam.answersPdfUrl, 'respostas de exemplo'),
+      ...sampleExams.flatMap((sample) => [
+        downloadOfficialPdf(fetchImpl, sample.questionsPdfUrl, `questões do Sample Exam ${sample.examLetter}`),
+        downloadOfficialPdf(fetchImpl, sample.answersPdfUrl, `respostas do Sample Exam ${sample.examLetter}`),
+      ]),
     ]);
+    const sampleExamSets = sampleExams.map((sample, index) => ({
+      ...sample,
+      questionsPdfSha256: samplePdfResults[index * 2].pdfSha256,
+      answersPdfSha256: samplePdfResults[index * 2 + 1].pdfSha256,
+    }));
+    const sampleExam = sampleExamSets[0];
+    const questionsPdf = samplePdfResults[0];
+    const answersPdf = samplePdfResults[1];
     const { pdfSha256 } = syllabusPdf;
     const now = new Date();
     const documentChanged = Boolean(existing && (
@@ -312,6 +321,7 @@ export async function checkOfficialCtflSyllabus({ fetchImpl = fetch, prismaClien
       || existing.sampleExamVersion !== sampleExam.version
       || existing.sampleExamQuestionsPdfSha256 !== questionsPdf.pdfSha256
       || existing.sampleExamAnswersPdfSha256 !== answersPdf.pdfSha256
+      || JSON.stringify(existing.sampleExamSets || []) !== JSON.stringify(sampleExamSets)
     ));
 
     await storeCtflSyllabusDocument({
@@ -332,6 +342,7 @@ export async function checkOfficialCtflSyllabus({ fetchImpl = fetch, prismaClien
         pdfUrl: syllabus.pdfUrl,
         pdfSha256,
         sampleExamLetter: sampleExam.examLetter,
+        sampleExamSets,
         sampleExamVersion: sampleExam.version,
         sampleExamAnswersVersion: sampleExam.version,
         sampleExamQuestionsPdfUrl: sampleExam.questionsPdfUrl,
@@ -346,6 +357,7 @@ export async function checkOfficialCtflSyllabus({ fetchImpl = fetch, prismaClien
         pdfUrl: syllabus.pdfUrl,
         pdfSha256,
         sampleExamLetter: sampleExam.examLetter,
+        sampleExamSets,
         sampleExamVersion: sampleExam.version,
         sampleExamAnswersVersion: sampleExam.version,
         sampleExamQuestionsPdfUrl: sampleExam.questionsPdfUrl,

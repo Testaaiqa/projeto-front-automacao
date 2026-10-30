@@ -654,14 +654,6 @@ select:focus {
   margin: 4px 0 0;
 }
 
-.ctfl-upload-status {
-  color: #735100;
-  display: block;
-  font-size: 12px;
-  line-height: 1.5;
-  margin-top: 6px;
-}
-
 .ctfl-syllabus p.ctfl-monitor-status {
   border-left: 3px solid #8a92a0;
   font-weight: 700;
@@ -834,6 +826,36 @@ select:focus {
   margin-top: 18px;
 }
 
+.ctfl-chapter-results {
+  margin-top: 18px;
+}
+
+.ctfl-chapter-results h4 {
+  color: #293446;
+  font-size: 14px;
+  margin: 0 0 8px;
+}
+
+.ctfl-chapter-results ul {
+  display: grid;
+  gap: 6px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.ctfl-chapter-results li {
+  align-items: center;
+  background: #f5f7f9;
+  border-radius: 4px;
+  color: #526071;
+  display: flex;
+  font-size: 12px;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 7px 9px;
+}
+
 .ctfl-review-list {
   display: grid;
   gap: 10px;
@@ -863,70 +885,6 @@ select:focus {
   color: #1d2433;
 }
 
-.ctfl-upload-button {
-  align-items: center;
-  border: 1px solid #126d82;
-  border-radius: 6px;
-  color: #126d82;
-  cursor: pointer;
-  display: inline-flex;
-  flex: 0 0 auto;
-  font-size: 13px;
-  min-height: 38px;
-  padding: 7px 12px;
-}
-
-.ctfl-upload-button:hover {
-  background: #edf7f8;
-}
-
-.ctfl-upload-button input {
-  height: 1px;
-  opacity: 0;
-  overflow: hidden;
-  position: absolute;
-  width: 1px;
-}
-
-.ctfl-upload-button:focus-within {
-  outline: 3px solid rgba(18, 109, 130, 0.2);
-  outline-offset: 2px;
-}
-
-.ctfl-mode-switch {
-  align-items: center;
-  border-bottom: 1px solid #d9e2e8;
-  display: flex;
-  gap: 24px;
-}
-
-.ctfl-mode-switch button {
-  background: none;
-  border: 0;
-  border-bottom: 3px solid transparent;
-  color: #687588;
-  font-size: 14px;
-  font-weight: 700;
-  margin-bottom: -1px;
-  min-height: 44px;
-  padding: 0 2px;
-}
-
-.ctfl-mode-switch button.active {
-  border-bottom-color: #126d82;
-  color: #126d82;
-}
-
-.ctfl-coming-tag {
-  background: #fff4d9;
-  border-radius: 3px;
-  color: #735100;
-  font-size: 9px;
-  margin-left: 7px;
-  padding: 3px 5px;
-  vertical-align: middle;
-}
-
 .ctfl-quiz-layout {
   align-items: start;
   display: grid;
@@ -944,17 +902,6 @@ select:focus {
 .ctfl-quiz {
   min-width: 0;
   padding: 24px;
-}
-
-.ctfl-demo-notice {
-  background: #fff7e6;
-  border: 1px solid #f0c46d;
-  border-radius: 5px;
-  color: #735100;
-  font-size: 13px;
-  line-height: 1.5;
-  margin-bottom: 22px;
-  padding: 10px 12px;
 }
 
 .ctfl-quiz-meta {
@@ -1169,20 +1116,6 @@ select:focus {
   .ctfl-syllabus {
     align-items: flex-start;
     flex-direction: column;
-  }
-
-  .ctfl-mode-switch {
-    gap: 14px;
-  }
-
-  .ctfl-mode-switch button {
-    font-size: 12px;
-  }
-
-  .ctfl-coming-tag {
-    display: block;
-    margin: 3px 0 0;
-    width: fit-content;
   }
 
   .ctfl-quiz {
@@ -3816,29 +3749,14 @@ select:focus {
   border-left-color: #e5aa35;
 }
 
-:root[data-theme="dark"] .ctfl-mode-switch {
-  border-bottom-color: #304258;
-}
-
-:root[data-theme="dark"] .ctfl-mode-switch button,
 :root[data-theme="dark"] .ctfl-quiz-meta,
 :root[data-theme="dark"] .ctfl-quiz-actions,
 :root[data-theme="dark"] .ctfl-note-label {
   color: #aebdce;
 }
 
-:root[data-theme="dark"] .ctfl-mode-switch button.active,
-:root[data-theme="dark"] .ctfl-source-link,
-:root[data-theme="dark"] .ctfl-upload-button {
+:root[data-theme="dark"] .ctfl-source-link {
   color: #67d0e5;
-}
-
-:root[data-theme="dark"] .ctfl-mode-switch button.active {
-  border-bottom-color: #67d0e5;
-}
-
-:root[data-theme="dark"] .ctfl-upload-button {
-  border-color: #67d0e5;
 }
 
 :root[data-theme="dark"] .ctfl-option input {
@@ -3851,13 +3769,6 @@ select:focus {
 
 :root[data-theme="dark"] .ctfl-side-note > strong {
   color: #e7edf5;
-}
-
-:root[data-theme="dark"] .ctfl-coming-tag,
-:root[data-theme="dark"] .ctfl-demo-notice {
-  background: rgba(235, 181, 68, 0.12);
-  border-color: #806a3b;
-  color: #f3c76e;
 }
 
 :root[data-theme="dark"] .ctfl-option {
@@ -3898,10 +3809,6 @@ select:focus {
 
 :root[data-theme="dark"] .ctfl-note-value {
   color: #dce7f2;
-}
-
-:root[data-theme="dark"] .ctfl-upload-status {
-  color: #f3c76e;
 }
 
 :root[data-theme="dark"] .ctfl-monitor-metadata {
@@ -3991,10 +3898,6 @@ select:focus {
   color: #9bd9bf;
 }
 
-:root[data-theme="dark"] .ctfl-upload-button:hover {
-  background: #233247;
-}
-
 .ctfl-quiz-toolbar {
   align-items: center;
   display: flex;
@@ -4078,51 +3981,26 @@ select:focus {
   margin: 0;
 }
 
-.ctfl-time-options {
-  border: 0;
-  display: flex;
-  gap: 10px;
-  margin: 0;
-  min-width: 0;
-  padding: 0;
-}
-
-.ctfl-time-option {
+.ctfl-extra-time-option {
   align-items: flex-start;
   background: #f5f7f9;
   border: 1px solid #d9e2e8;
   border-radius: 5px;
   color: #394558;
   cursor: pointer;
-  display: grid;
-  flex: 1;
+  display: flex;
   font-size: 14px;
-  font-weight: 700;
-  gap: 4px 9px;
-  grid-template-columns: 18px minmax(0, 1fr);
+  gap: 10px;
   line-height: 1.4;
   padding: 12px;
 }
 
-.ctfl-time-option.selected {
-  background: #edf7f8;
-  border-color: #126d82;
-}
-
-.ctfl-time-option input {
+.ctfl-extra-time-option input {
   accent-color: #126d82;
-  grid-row: span 2;
-  height: 16px;
+  flex: 0 0 auto;
   margin: 2px 0 0;
   min-height: 16px;
   width: 16px;
-}
-
-.ctfl-time-option small {
-  color: #687588;
-  font-size: 11px;
-  font-weight: 500;
-  grid-column: 2;
 }
 
 .ctfl-setup-note {
@@ -4165,34 +4043,29 @@ select:focus {
   color: #e7edf5;
 }
 
-:root[data-theme="dark"] .ctfl-time-option {
+:root[data-theme="dark"] .ctfl-extra-time-option,
+:root[data-theme="dark"] .ctfl-chapter-results li {
   background: #182231;
   border-color: #304258;
   color: #dce7f2;
 }
 
-:root[data-theme="dark"] .ctfl-time-option.selected {
-  background: #233247;
-  border-color: #67d0e5;
-}
-
-:root[data-theme="dark"] .ctfl-time-option input {
+:root[data-theme="dark"] .ctfl-extra-time-option input {
   accent-color: #67d0e5;
 }
 
-:root[data-theme="dark"] .ctfl-time-option small,
 :root[data-theme="dark"] .ctfl-setup-note {
   color: #aebdce;
+}
+
+:root[data-theme="dark"] .ctfl-chapter-results h4 {
+  color: #e7edf5;
 }
 
 @media (max-width: 520px) {
   .ctfl-quiz-toolbar {
     align-items: flex-start;
     flex-direction: column-reverse;
-  }
-
-  .ctfl-time-options {
-    flex-direction: column;
   }
 
   .ctfl-question-nav {

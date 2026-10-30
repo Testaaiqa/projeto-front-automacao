@@ -75,6 +75,7 @@ model CtflSyllabusMonitor {
   pdfUrl                     String?
   pdfSha256                  String?
   sampleExamLetter           String?
+    sampleExamSets             Json?
   sampleExamVersion          String?
   sampleExamAnswersVersion   String?
   sampleExamQuestionsPdfUrl  String?

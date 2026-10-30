@@ -15,13 +15,13 @@ import {
 } from './ctflSyllabus.js';
 
 const officialPage = [
-  '<a href="https://istqb.org/?sdm_process_download=1&amp;#038;download_id=3345">ISTQB CTFL Syllabus v4.0.1</a>',
-  '<a href="https://istqb.org/?sdm_process_download=1&amp;#038;download_id=3352">ISTQB CTFL v4.0 Sample Exam A- Questions v1.7</a>',
-  '<a href="https://istqb.org/?sdm_process_download=1&amp;#038;download_id=3357">ISTQB CTFL v4.0 Sample Exam A- Answers v1.7</a>',
-  '<a href="https://istqb.org/?sdm_process_download=1&amp;#038;download_id=3359">ISTQB CTFL v4.0 Sample Exam B- Questions v1.7</a>',
-  '<a href="https://istqb.org/?sdm_process_download=1&amp;#038;download_id=3365">ISTQB CTFL v4.0 Sample Exam B- Answers v1.7</a>',
-  '<a href="https://istqb.org/?sdm_process_download=1&amp;#038;download_id=3369">ISTQB CTFL v4.0 Sample Exam C- Questions v1.6</a>',
-  '<a href="https://istqb.org/?sdm_process_download=1&amp;#038;download_id=3372">ISTQB CTFL v4.0 Sample Exam C- Answers v1.6</a>',
+  '<a href="https://www.bstqb.qa/files/syllabus_ctfl_4.0br.pdf">CTFL Syllabus v4.0</a>',
+  '<a href="https://www.bstqb.qa/files/ISTQB_CTFL_v4.0_Sample-Exam-A-Questions_v1.7BR.pdf">CTFL v4.0 Sample Exam A Questions v1.7</a>',
+  '<a href="https://www.bstqb.qa/files/ISTQB_CTFL_v4.0_Sample-Exam-A-Answers_v1.7BR.pdf">CTFL v4.0 Sample Exam A Answers v1.7</a>',
+  '<a href="https://www.bstqb.qa/files/ISTQB_CTFL_v4.0_Sample-Exam-B-Questions_v1.7BR.pdf">CTFL v4.0 Sample Exam B Questions v1.7</a>',
+  '<a href="https://www.bstqb.qa/files/ISTQB_CTFL_v4.0_Sample-Exam-B-Answers_v1.7BR.pdf">CTFL v4.0 Sample Exam B Answers v1.7</a>',
+  '<a href="https://www.bstqb.qa/?sdm_process_download=1&amp;#038;download_id=3369">ISTQB CTFL v4.0 Sample Exam C- Questions v1.6</a>',
+  '<a href="https://www.bstqb.qa/?sdm_process_download=1&amp;#038;download_id=3372">ISTQB CTFL v4.0 Sample Exam C- Answers v1.6</a>',
 ].join('');
 
 function createPrismaMock(initialMonitorRecord = null) {
@@ -82,8 +82,8 @@ function createPrismaMock(initialMonitorRecord = null) {
 
 test('extracts the current syllabus version and official PDF URL', () => {
   assert.deepEqual(extractOfficialSyllabus(officialPage), {
-    version: '4.0.1',
-    pdfUrl: 'https://istqb.org/?sdm_process_download=1&download_id=3345',
+    version: '4.0',
+    pdfUrl: 'https://www.bstqb.qa/files/syllabus_ctfl_4.0br.pdf',
   });
 });
 
@@ -92,32 +92,32 @@ test('extracts the latest complete official sample exam questions and answers pa
     syllabusVersion: '4.0',
     examLetter: 'A',
     version: '1.7',
-    questionsPdfUrl: 'https://istqb.org/?sdm_process_download=1&download_id=3352',
-    answersPdfUrl: 'https://istqb.org/?sdm_process_download=1&download_id=3357',
+    questionsPdfUrl: 'https://www.bstqb.qa/files/ISTQB_CTFL_v4.0_Sample-Exam-A-Questions_v1.7BR.pdf',
+    answersPdfUrl: 'https://www.bstqb.qa/files/ISTQB_CTFL_v4.0_Sample-Exam-A-Answers_v1.7BR.pdf',
   });
 });
 
 test('rejects syllabus links outside the official ISTQB domain', () => {
-  const unsafePage = '<a href="https://example.com/syllabus.pdf">ISTQB CTFL Syllabus v4.0.1</a>';
+  const unsafePage = '<a href="https://example.com/syllabus.pdf">ISTQB CTFL Syllabus v4.0</a>';
   assert.throws(() => extractOfficialSyllabus(unsafePage), /domínio oficial/);
 });
 
 test('flags a question bank version that differs from the official syllabus', () => {
   const status = buildCtflSyllabusStatus({
-    officialVersion: '4.0.2',
+    officialVersion: '4.1',
     lastCheckedAt: new Date('2026-09-30T00:00:00.000Z'),
   });
 
   assert.equal(status.status, 'review-required');
   assert.equal(status.versionMatches, false);
   assert.equal(status.pdfHashMatches, false);
-  assert.equal(status.questionBankVersion, '4.0.1');
+  assert.equal(status.questionBankVersion, '4.0');
 });
 
 test('requires an explicitly reviewed PDF hash before reporting the bank as aligned', () => {
   const pdfSha256 = 'a'.repeat(64);
   const record = {
-    officialVersion: '4.0.1',
+    officialVersion: '4.0',
     pdfSha256,
     sampleExamVersion: '1.7',
     sampleQuestionsPdfSha256: 'b'.repeat(64),
@@ -129,7 +129,7 @@ test('requires an explicitly reviewed PDF hash before reporting the bank as alig
   assert.equal(buildCtflSyllabusStatus(record).status, 'review-required');
 
   const reviewedStatus = buildCtflSyllabusStatus(record, {
-    questionBankVersion: '4.0.1',
+    questionBankVersion: '4.0',
     questionBankPdfSha256: pdfSha256,
     questionBankSampleVersion: '1.7',
     questionBankSampleSha256: 'b'.repeat(64),
@@ -143,7 +143,7 @@ test('downloads, hashes, and records a changed official PDF', async () => {
   const pdfBytes = Buffer.from('%PDF-1.4\nsyllabus fixture');
   const previousRecord = {
     officialVersion: '4.0',
-    pdfUrl: 'https://istqb.org/?download_id=old',
+    pdfUrl: 'https://www.bstqb.qa/?download_id=old',
     pdfSha256: 'previous-hash',
     lastChangedAt: null,
   };
@@ -162,13 +162,13 @@ test('downloads, hashes, and records a changed official PDF', async () => {
 
   assert.equal(result.success, true);
   assert.equal(result.documentChanged, true);
-  assert.equal(result.officialVersion, '4.0.1');
+  assert.equal(result.officialVersion, '4.0');
   assert.equal(result.sampleExamVersion, '1.7');
   assert.equal(result.sampleExamAnswersVersion, '1.7');
   assert.equal(result.pdfSha256, createHash('sha256').update(pdfBytes).digest('hex'));
   assert.equal(result.sampleQuestionsPdfSha256, createHash('sha256').update(pdfBytes).digest('hex'));
   assert.equal(result.sampleAnswersPdfSha256, createHash('sha256').update(pdfBytes).digest('hex'));
-  assert.equal(monitor().officialVersion, '4.0.1');
+  assert.equal(monitor().officialVersion, '4.0');
   assert.equal(monitor().sampleExamLetter, 'A');
   assert.ok(monitor().lastChangedAt instanceof Date);
   assert.equal(documents.length, 1);
@@ -191,7 +191,7 @@ test('stores the initial official PDF without requiring an existing monitor row'
   assert.equal(result.success, true);
   assert.equal(result.status, 'review-required');
   assert.equal(documents.length, 1);
-  assert.equal(documents[0].officialVersion, '4.0.1');
+  assert.equal(documents[0].officialVersion, '4.0');
   assert.equal(documents[0].content.toString(), pdfBytes.toString());
 });
 
@@ -203,7 +203,7 @@ test('retains only the two most recently checked official PDFs', async () => {
     await storeCtflSyllabusDocument({
       pdfBytes,
       officialVersion: `4.0.${version}`,
-      pdfUrl: `https://istqb.org/syllabus-${version}.pdf`,
+      pdfUrl: `https://www.bstqb.qa/syllabus-${version}.pdf`,
       pdfSha256: createHash('sha256').update(pdfBytes).digest('hex'),
       prismaClient,
       checkedAt: new Date(`2026-09-30T00:00:0${version}.000Z`),
@@ -212,7 +212,7 @@ test('retains only the two most recently checked official PDFs', async () => {
 
   const retained = [...documents].sort((left, right) => right.lastSeenAt - left.lastSeenAt);
   assert.equal(documents.length, 2);
-  assert.deepEqual(retained.map(({ officialVersion }) => officialVersion), ['4.0.3', '4.0.2']);
+  assert.deepEqual(retained.map(({ officialVersion }) => officialVersion), ['4.0.3', '4.1']);
 });
 
 test('does not duplicate a PDF that has already been saved', async () => {
@@ -221,8 +221,8 @@ test('does not duplicate a PDF that has already been saved', async () => {
   const pdfSha256 = createHash('sha256').update(pdfBytes).digest('hex');
   const params = {
     pdfBytes,
-    officialVersion: '4.0.1',
-    pdfUrl: 'https://istqb.org/syllabus.pdf',
+    officialVersion: '4.0',
+    pdfUrl: 'https://www.bstqb.qa/syllabus.pdf',
     pdfSha256,
     prismaClient,
   };
@@ -240,8 +240,8 @@ test('returns only metadata in status and serves saved PDF bytes by hash', async
   const pdfSha256 = createHash('sha256').update(pdfBytes).digest('hex');
   await storeCtflSyllabusDocument({
     pdfBytes,
-    officialVersion: '4.0.1',
-    pdfUrl: 'https://istqb.org/syllabus.pdf',
+    officialVersion: '4.0',
+    pdfUrl: 'https://www.bstqb.qa/syllabus.pdf',
     pdfSha256,
     prismaClient,
   });

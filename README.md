@@ -27,11 +27,13 @@ Para produção, configure `DATABASE_URL` e `AUTH_SECRET` nas variáveis de ambi
 
 O módulo bancário usa as rotas autenticadas `GET /banking/account`, `GET /banking/transactions`, `POST /banking/transfers` e `POST /banking/credit-analysis`. Envie o token retornado pelo login como `Authorization: Bearer <accessToken>`.
 
-## Monitor do syllabus CTFL
+## Preparacao CTFL (BSTQB)
 
-Em produção, o Vercel Cron consulta diariamente a página oficial do [ISTQB CTFL](https://www.istqb.org/certifications/certified-tester-foundation-level), identifica e baixa o syllabus e o par mais recente de PDFs de questões/respostas do Sample Exam. Versões, URLs e hashes dos quatro downloads são registrados no Neon; as questões e respostas de exemplo são validadas e descartadas após a checagem. A tabela binária conserva somente as duas versões mais recentes do syllabus, deduplicadas por hash e limitadas transacionalmente. Configure `CRON_SECRET` no Vercel para autorizar `/api/ctfl/syllabus/check`; o horário definido é 06:00 UTC. As migrações `20260930120000_add_ctfl_syllabus_monitor`, `20260930130000_add_ctfl_syllabus_documents` e `20260930140000_add_ctfl_sample_exam_monitor` criam as tabelas e os campos usados pelo monitor.
+A plataforma acompanha a referencia adotada no Brasil: syllabus CTFL v4.0 em portugues brasileiro, publicado pelo [BSTQB](https://www.bstqb.qa/ctfl). A prova tem 40 questoes, nota minima 26/40 e 60 minutos. A distribuicao e: capitulo 1, 8; capitulo 2, 6; capitulo 3, 4; capitulo 4, 11; capitulo 5, 9; capitulo 6, 2. O tempo adicional de 25% aplica-se ao candidato estrangeiro que faz a prova em portugues, conforme orientacao do BSTQB.
 
-A prova PDF usa um banco JSON de 40 questões originais, com embaralhamento, navegação, timer CTFL (60 min ou 75 min) e nota mínima 26/40. O texto dos PDFs oficiais de exemplo não é copiado para esse JSON. O cron detecta alterações, mas não gera nem aprova novas questões: quando a versão amostrada muda, revise o banco e atualize `sourceSampleExamVersion` em `src/data/ctfl-question-bank.json`. Configure `CTFL_QUESTION_BANK_VERSION`, `CTFL_QUESTION_BANK_PDF_SHA256`, `CTFL_QUESTION_BANK_SAMPLE_VERSION` e `CTFL_QUESTION_BANK_SAMPLE_SHA256` somente após uma revisão humana dos materiais correspondentes; sem os fingerprints aprovados, o status fica em revisão. A base do percurso de IA permanece independente.
+O banco ativo contem 47 questoes autorais e gera simulados de 40 conforme essa distribuicao. A versao anterior foi arquivada para preservar o historico, sem misturar edicoes do syllabus. Quando o syllabus muda, o monitor sinaliza revisao do banco; nao reaproveita nem descarta questoes automaticamente. Certificados obtidos continuam validos conforme a politica do ISTQB.
+
+O monitor diario consulta a pagina do BSTQB e registra o PDF do syllabus e os Sample Exams A e B, com versoes, URLs e hashes. Ele alerta quando a versao ou os fingerprints aprovados diferem, mas nao altera nem aprova questoes automaticamente. Configure `CRON_SECRET` no Vercel para autorizar `/api/ctfl/syllabus/check`. Hashes aprovados exigem revisao humana; sem eles, o status permanece em revisao. A migracao `20261030180000_add_ctfl_sample_exam_sets` adiciona os metadados dos conjuntos A/B.
 
 ---
 
