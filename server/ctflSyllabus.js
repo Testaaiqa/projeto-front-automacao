@@ -406,7 +406,24 @@ export async function handleCtflSyllabusRequest(request, sendJson, sendPdf) {
 
   if (routePath === '/ctfl/syllabus' && request.method === 'GET') {
     try {
-      sendJson(200, { success: true, ...(await readCtflSyllabusStatus()) });
+      const database = (await import('./prisma.js')).prisma;
+      const currentRecord = await database.ctflSyllabusMonitor.findUnique({
+        where: { id: MONITOR_ID },
+        select: { id: true },
+      });
+
+      // A new deployment may receive its first visit before the daily cron runs.
+      // Seed the retained syllabus PDF on that first status request so the page
+      // has a document to offer immediately after the initial check completes.
+      if (!currentRecord) {
+        try {
+          await checkOfficialCtflSyllabus({ prismaClient: database });
+        } catch {
+          // The checker persists its error in the monitor row; return that status.
+        }
+      }
+
+      sendJson(200, { success: true, ...(await readCtflSyllabusStatus(database)) });
     } catch (error) {
       console.error('Falha ao consultar status do syllabus CTFL:', error);
       sendJson(503, {
